@@ -282,16 +282,16 @@ public class trusty implements ActionListener {
 	 * !!!!!!!
 	 */
 	
-	public class physics {
+	public static class physics {
 		
 		@SuppressWarnings("unused")
-		private static double WIDTH, HEIGHT, FRICTION, SPEED;
-		private static HashMap<String, ArrayList<String>> objects = new HashMap<>();
-		private static HashMap<String, ArrayList<String>> barriers = new HashMap<>();
-		private static ArrayList<String> currentData = new ArrayList<>();
+		private  double WIDTH, HEIGHT, FRICTION, SPEED;
+		private  HashMap<String, ArrayList<String>> objects = new HashMap<>();
+		private  HashMap<String, ArrayList<String>> barriers = new HashMap<>();
+		private  ArrayList<String> currentData = new ArrayList<>();
 		
 		
-		public static void createPhysics(int windowWidth, int windowHeight, double frictionOnSurface) {
+		public  void createPhysics(int windowWidth, int windowHeight, double frictionOnSurface) {
 			WIDTH = windowWidth;
 			HEIGHT = windowHeight;
 			FRICTION = frictionOnSurface;
@@ -300,18 +300,18 @@ public class trusty implements ActionListener {
 		
 		
 		
-		private static double currentObjectMass = 0;
-		private static int currentObjectWidth = 0;
-		private static int currentObjectHeight = 0;
-		private static double currentXVel = 0;
-		private static double currentYVel = 0;
-		private static double currentObjectFriction = 0;
-		private static Component currentObject;
-		private static boolean xHit = false;
-		private static boolean yHit = false;
+		private  double currentObjectMass = 0;
+		private  int currentObjectWidth = 0;
+		private  int currentObjectHeight = 0;
+		private  double currentXVel = 0;
+		private  double currentYVel = 0;
+		private  double currentObjectFriction = 0;
+		private  Component currentObject;
+		private  boolean xHit = false;
+		private  boolean yHit = false;
 		
 		
-		public static void startComponentMotion(Component object, double dx, double dy, int speedControlX, int speedControlY) {
+		public  void startComponentMotion(Component object, double dx, double dy, int speedControlX, int speedControlY) {
 			ArrayList<String> objectDetails = objects.get(object.getName());
 			
 			currentObject = object;
@@ -426,7 +426,7 @@ public class trusty implements ActionListener {
 		
 		
 		
-		public static void addPhysics(Component object, double mass) {
+		public  void addPhysics(Component object, double mass) {
 			
 			if (currentData.size() != 0) {	
 				currentData.remove(currentData.size()-1);
@@ -441,7 +441,7 @@ public class trusty implements ActionListener {
 		
 		
 		
-		public static void addBarrierObject(Component barrier, boolean movable, int mass) {
+		public  void addBarrierObject(Component barrier, boolean movable, int mass) {
 			if (currentData.size() != 0) {
 				currentData.remove(currentData.size()-1);
 			}
@@ -454,7 +454,7 @@ public class trusty implements ActionListener {
 		}
 		
 		
-		public static void testForCollisions() {
+		public  void testForCollisions() {
 			
 			
 			
@@ -462,7 +462,7 @@ public class trusty implements ActionListener {
 		
 		
 		
-		public static boolean intersects(Component object1, Component object2) {
+		public boolean intersects(Component object1, Component object2) {
 			
 			int object1Width = object1.getWidth();
 	        int object1Height = object1.getHeight();
@@ -499,7 +499,7 @@ public class trusty implements ActionListener {
 	//Testing Class
 	public class TestAssist {
 		
-		public static<T> boolean assertEquals(T expected, T actual) {
+		public <T> boolean assertEquals(T expected, T actual) {
 			if (expected != actual) { 
 				System.out.println("Test failed!\nExpected: "+expected+"\nActual: "+actual);
 				return false;
@@ -511,7 +511,7 @@ public class trusty implements ActionListener {
 		}
 		
 		
-		public static HashMap<String, String> assertSetEquals(ArrayList<?> expectedSet, ArrayList<?> actualSet) {
+		public HashMap<String, String> assertSetEquals(ArrayList<?> expectedSet, ArrayList<?> actualSet) {
 			
 			HashMap<String, String> failedTests = new HashMap<>();
 			
@@ -542,7 +542,7 @@ public class trusty implements ActionListener {
 	//Requests Class
 	public class Requests {
 		
-		public static String get(String url) {
+		public String get(String url) {
 			try {
 				HttpRequest getReq = HttpRequest.newBuilder()
 						.uri(new URI(url))
@@ -557,7 +557,7 @@ public class trusty implements ActionListener {
 		}
 		
 		
-		public static String post(String url, String json) throws IOException {
+		public String post(String url, String json) throws IOException {
 			URL uri = new URL(url);
 			URLConnection con = uri.openConnection();
 			HttpURLConnection http = (HttpURLConnection)con;
@@ -588,11 +588,11 @@ public class trusty implements ActionListener {
 		
 		public class server {
 			
-			private static ServerSocket socketConnection = null;
-			private static Socket acceptClient = null;
+			private  ServerSocket socketConnection = null;
+			private  Socket acceptClient = null;
 			
 			
-			public static ServerSocket setup(int port) {
+			public  ServerSocket setup(int port) {
 				try {
 					socketConnection = new ServerSocket(port);
 					acceptClient = socketConnection.accept();
@@ -604,7 +604,7 @@ public class trusty implements ActionListener {
 			
 			
 			
-			public static String getInput() {
+			public  String getInput() {
 				InputStream inputClient;
 				String text = null;
 				try {
@@ -618,7 +618,7 @@ public class trusty implements ActionListener {
 			
 			
 			
-			public static void sendOutput(String text) {
+			public  void sendOutput(String text) {
 				OutputStream output = null;
 				try {
 					output = acceptClient.getOutputStream();
@@ -632,16 +632,16 @@ public class trusty implements ActionListener {
 		
 		public class client {
 			
-			public static Socket connectToServer;
+			public  Socket connectToServer;
 			
-			public static void setup(String ip, int port) {
+			public  void setup(String ip, int port) {
 				try {
 					connectToServer = new Socket(ip, port);
 				}
 				catch (IOException e) {}
 			}
 			
-			public static String getInput() {
+			public  String getInput() {
 				
 				String text = null;
 				
@@ -654,7 +654,7 @@ public class trusty implements ActionListener {
 				return text;
 			}
 			
-			public static void sendOutput(String text) {
+			public  void sendOutput(String text) {
 				OutputStream streamOut = null;
 				try {
 					streamOut = connectToServer.getOutputStream();
@@ -668,10 +668,10 @@ public class trusty implements ActionListener {
  	}
 	
 	public class EncodeDecoder {
-		public static String encode(String text) {
+		public  String encode(String text) {
 			return Base64.getEncoder().encodeToString(text.getBytes());
 		}
-		public static String decode(String text) {
+		public  String decode(String text) {
 			return new String(Base64.getDecoder().decode(text));
 		}
 	}
