@@ -30,7 +30,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JViewport;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import com.andromeda.nav.Navbar;
+import com.andromeda.desc.DescriptionBar;
 import com.andromeda.vgraph.GraphGUI;
 import com.andromeda.vgraph.Instruction;
 import com.formdev.flatlaf.FlatIntelliJLaf;
@@ -41,7 +41,7 @@ public class Main {
 	private static GraphGUI graph;
 	private static GraphGUI currentGraph;
 	private static JTabbedPane tabbedPane;
-	private static Navbar nav = new Navbar(screen);
+	private static DescriptionBar descBar = new DescriptionBar(screen);
 	
 	public static void main(String[] args) throws Exception {
 
@@ -213,8 +213,6 @@ public class Main {
 					menuBar.add(editBar);
 			frame.setJMenuBar(menuBar);
 			
-			frame.getContentPane().add(nav);
-			
 			tabbedPane = new JTabbedPane();
 			
 			currentGraph = graph = new GraphGUI(screen.width/5, -screen.height/25, 15*screen.width, 10*screen.height);
@@ -234,7 +232,7 @@ public class Main {
 				currentGraph = (GraphGUI) viewport.getView();
 			});
 			
-			tabbedPane.setBounds(screen.width/5+screen.width/170, screen.height/35, Math.round(frame.getWidth()/1.25f)-frame.getWidth()/50, frame.getHeight()-frame.getHeight()/8);
+			tabbedPane.setBounds(screen.width/49, screen.height/45, Math.round(frame.getWidth()/1.05f), frame.getHeight()-frame.getHeight()/8);
 			frame.getContentPane().add(tabbedPane);
 			
 			graph.addMouseListener(new MouseListener() {
@@ -264,9 +262,19 @@ public class Main {
 					for(Instruction j : graph.findObject(e.getX(), e.getY())) {
 						System.out.println("("+j.getX()+", "+j.getY()+")");
 						HashMap<String, Dimension> text = new HashMap<>();
-							text.put(j.getType(), new Dimension(50, 50));
-						nav.renderText(text);
-						nav.repaint();
+							text.put(j.getType(), new Dimension(descBar.getWidth()/19, descBar.getHeight()/20));
+						descBar.renderText(text);
+						
+						tabbedPane.setBounds(screen.width/5+screen.width/170, screen.height/35, Math.round(frame.getWidth()/1.25f)-frame.getWidth()/50, frame.getHeight()-frame.getHeight()/8);
+						tabbedPane.repaint();
+						try {
+							Thread.sleep(100);
+							frame.getContentPane().add(descBar);
+							descBar.repaint();
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+						}
+						
 					}
 				}
 				
@@ -374,8 +382,8 @@ public class Main {
 					System.out.println("("+j.getX()+", "+j.getY()+")");
 					HashMap<String, Dimension> text = new HashMap<>();
 						text.put(j.getType(), new Dimension(50, 50));
-					nav.renderText(text);
-					nav.repaint();
+					descBar.renderText(text);
+					descBar.repaint();
 				}
 			}
 			

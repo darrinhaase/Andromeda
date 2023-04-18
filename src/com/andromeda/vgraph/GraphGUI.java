@@ -14,7 +14,7 @@ import com.andromeda.main.trusty;
 @SuppressWarnings("serial")
 public class GraphGUI extends JPanel {
 
-	private static Dimension size = null;
+	private Dimension size = null;
 	public boolean saved = true;
 	public File saveFile = null;
 	private ArrayList<Instruction> instructions = new ArrayList<>();
