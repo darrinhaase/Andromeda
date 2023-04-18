@@ -41,6 +41,7 @@ public class Main {
 	private static GraphGUI graph;
 	private static GraphGUI currentGraph;
 	private static JTabbedPane tabbedPane;
+	private static Navbar nav = new Navbar(screen);
 	
 	public static void main(String[] args) throws Exception {
 
@@ -212,7 +213,6 @@ public class Main {
 					menuBar.add(editBar);
 			frame.setJMenuBar(menuBar);
 			
-			Navbar nav = new Navbar(screen);
 			frame.getContentPane().add(nav);
 			
 			tabbedPane = new JTabbedPane();
@@ -261,8 +261,12 @@ public class Main {
 			graph.addMouseMotionListener(new MouseMotionListener() {
 				@Override
 				public void mouseMoved(MouseEvent e) {
-					for(Dimension j : graph.findObject(e.getX(), e.getY())) {
-						System.out.println("("+j.getWidth()+", "+j.getHeight()+")");
+					for(Instruction j : graph.findObject(e.getX(), e.getY())) {
+						System.out.println("("+j.getX()+", "+j.getY()+")");
+						HashMap<String, Dimension> text = new HashMap<>();
+							text.put(j.getType(), new Dimension(50, 50));
+						nav.renderText(text);
+						nav.repaint();
 					}
 				}
 				
@@ -366,8 +370,12 @@ public class Main {
 		newGraph.addMouseMotionListener(new MouseMotionListener() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				for(Dimension j : newGraph.findObject(e.getX(), e.getY())) {
-					System.out.println("("+j.getWidth()+", "+j.getHeight()+")");
+				for(Instruction j : newGraph.findObject(e.getX(), e.getY())) {
+					System.out.println("("+j.getX()+", "+j.getY()+")");
+					HashMap<String, Dimension> text = new HashMap<>();
+						text.put(j.getType(), new Dimension(50, 50));
+					nav.renderText(text);
+					nav.repaint();
 				}
 			}
 			
@@ -376,11 +384,11 @@ public class Main {
 		});
 		
 		JScrollPane sP = new JScrollPane(newGraph);
-		sP.getVerticalScrollBar().setUnitIncrement(15);
-		sP.getHorizontalScrollBar().setUnitIncrement(15);
-		sP.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		sP.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		sP.setBorder(null);
+			sP.getVerticalScrollBar().setUnitIncrement(15);
+			sP.getHorizontalScrollBar().setUnitIncrement(15);
+			sP.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+			sP.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+			sP.setBorder(null);
 		
 		return sP;
 	}

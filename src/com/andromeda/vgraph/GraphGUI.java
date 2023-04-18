@@ -41,7 +41,7 @@ public class GraphGUI extends JPanel {
 		x = x-(r/2);
 		y = y-(r/2);
 		
-		Instruction tempInstruction = new Instruction(x, y, "circleDraw", String.valueOf(naming));
+		Instruction tempInstruction = new Instruction(x, y, "Circle", String.valueOf(naming));
 			tempInstruction.setFilled(true);
 			tempInstruction.setRadius(r);
 			
@@ -64,16 +64,16 @@ public class GraphGUI extends JPanel {
 		PlotPoint point1 = plots.get(p1);
 		PlotPoint point2 = plots.get(p2);
 		
-		Instruction tempInstruction = new Instruction(point1, point2, "lineDraw", String.valueOf(naming));
+		Instruction tempInstruction = new Instruction(point1, point2, "Line", String.valueOf(naming));
 		instructions.add(tempInstruction);
 		naming++;
 	}
 	
-	public ArrayList<Dimension> findObject(int x, int y) {
-		ArrayList<Dimension> possibleObjects = new ArrayList<>();
+	public ArrayList<Instruction> findObject(int x, int y) {
+		ArrayList<Instruction> possibleObjects = new ArrayList<>();
 		for (Instruction i : instructions) {
 			if (i.getBoundings().contains(x,y)) {
-				possibleObjects.add(new Dimension(i.getX(), i.getY()));
+				possibleObjects.add(i);
 			}
 		}
 		return possibleObjects;
@@ -91,12 +91,12 @@ public class GraphGUI extends JPanel {
 		for (Instruction i : instructions) {
 			switch(i.getType()) {
 			
-			case "lineDraw":
+			case "Line":
 			    g2.setStroke(new BasicStroke(3));
 				g2.drawLine(i.getP1().getX(), i.getP1().getY(), i.getP2().getX(), i.getP2().getY());
 				break;
 			
-			case "circleDraw":
+			case "Circle":
 			    g2.setStroke(new BasicStroke(3));
 			    if (i.getFilled())
 					g2.fillOval(i.getX(), i.getY(), i.getRadius(), i.getRadius());
