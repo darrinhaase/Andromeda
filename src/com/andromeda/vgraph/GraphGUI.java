@@ -21,8 +21,6 @@ public class GraphGUI extends JPanel {
 	private HashMap<String, PlotPoint> plots = new HashMap<>();
 	private int naming = 0;
 	
-	private int currentIndex = 0;
-	
 	public ArrayList<Instruction> getInstructions() {
 		return instructions;
 	}
@@ -37,27 +35,29 @@ public class GraphGUI extends JPanel {
 		this.setPreferredSize(size);
 	}
 	
-	public void drawCircle(int x, int y, int r) {
+	public void drawCircle(int x, int y, int r, String name) {
 		x = x-(r/2);
 		y = y-(r/2);
 		
-		Instruction tempInstruction = new Instruction(x, y, "Circle", String.valueOf(naming));
+		Instruction tempInstruction = new Instruction(x, y, name, String.valueOf(naming));
 			tempInstruction.setFilled(true);
 			tempInstruction.setRadius(r);
 			
 		instructions.add(tempInstruction);
-		naming++;
 	}
 
 	public void plot(String name, int x, int y) {
 		plots.put(name, new PlotPoint(x, y));
-		drawCircle(x,y,Main.screen.width/180);
+		drawCircle(x,y,Main.screen.width/180, "Point");
 	}
 	
 	public void plot(int x, int y) {
-		plots.put(trusty.str(currentIndex), new PlotPoint(x, y));
-		drawCircle(x,y,Main.screen.width/180);
-		currentIndex++;
+		plots.put(trusty.str(naming), new PlotPoint(x, y));
+		drawCircle(x,y,Main.screen.width/180, "Point");
+		if (naming == 1) {
+			drawLine(trusty.str(naming-1), trusty.str(naming));
+		}
+		naming++;
 	}
 	
 	public void drawLine(String p1, String p2) {
@@ -72,7 +72,7 @@ public class GraphGUI extends JPanel {
 	public ArrayList<Instruction> findObject(int x, int y) {
 		ArrayList<Instruction> possibleObjects = new ArrayList<>();
 		for (Instruction i : instructions) {
-			if (i.getBoundings().contains(x,y)) {
+			if (i.isColliding(x,y)) {
 				possibleObjects.add(i);
 			}
 		}
@@ -96,8 +96,15 @@ public class GraphGUI extends JPanel {
 				g2.drawLine(i.getP1().getX(), i.getP1().getY(), i.getP2().getX(), i.getP2().getY());
 				break;
 			
-			case "Circle":
+			case "Point":
 			    g2.setStroke(new BasicStroke(3));
+			    if (i.getFilled())
+					g2.fillOval(i.getX(), i.getY(), i.getRadius(), i.getRadius());
+			    else
+					g2.drawOval(i.getX(), i.getY(), i.getRadius(), i.getRadius());
+			    break;
+			case "Circle":
+				g2.setStroke(new BasicStroke(3));
 			    if (i.getFilled())
 					g2.fillOval(i.getX(), i.getY(), i.getRadius(), i.getRadius());
 			    else

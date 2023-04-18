@@ -260,20 +260,15 @@ public class Main {
 				@Override
 				public void mouseMoved(MouseEvent e) {
 					for(Instruction j : graph.findObject(e.getX(), e.getY())) {
-						System.out.println("("+j.getX()+", "+j.getY()+")");
 						HashMap<String, Dimension> text = new HashMap<>();
 							text.put(j.getType(), new Dimension(descBar.getWidth()/19, descBar.getHeight()/20));
 						descBar.renderText(text);
 						
 						tabbedPane.setBounds(screen.width/5+screen.width/170, screen.height/35, Math.round(frame.getWidth()/1.25f)-frame.getWidth()/50, frame.getHeight()-frame.getHeight()/8);
 						tabbedPane.repaint();
-						try {
-							Thread.sleep(100);
-							frame.getContentPane().add(descBar);
-							descBar.repaint();
-						} catch (InterruptedException e1) {
-							e1.printStackTrace();
-						}
+						
+						frame.getContentPane().add(descBar);
+						descBar.repaint();
 						
 					}
 				}
@@ -379,7 +374,6 @@ public class Main {
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				for(Instruction j : newGraph.findObject(e.getX(), e.getY())) {
-					System.out.println("("+j.getX()+", "+j.getY()+")");
 					HashMap<String, Dimension> text = new HashMap<>();
 						text.put(j.getType(), new Dimension(50, 50));
 					descBar.renderText(text);
