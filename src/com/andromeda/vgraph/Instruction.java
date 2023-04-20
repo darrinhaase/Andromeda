@@ -12,22 +12,28 @@ public class Instruction implements Serializable {
 	private PlotPoint p1,p2;
 	
 	public boolean isColliding(int x, int y) {
-		Rectangle bound = null;
 		if (p1 == null && p2 == null) {
-			bound = new Rectangle(this.x, this.y, r, r);
+			Rectangle bound = new Rectangle(this.x, this.y, r, r);
 			if (bound.contains(x,y)) return true;
 			else return false;
 		} else {
-			if (x >= p1.getX() && x <= p2.getX() && y >= p1.getY() && y <= p2.getY()) {
-				double slope = (double)(p2.getY() - p1.getY()) / (double)(p2.getX() - p1.getX());
-		        double yIntercept = p1.getY() - slope * p1.getX();
-	
-		        double distance = Math.abs(slope * x - y + yIntercept) / Math.sqrt(1 + slope * slope);
-		        if (distance < 3) {
-		            return true;
-		        } else {
-		        	return false;
-		        }
+			double minX = Math.min(p1.getX(), p2.getX());
+			double maxX = Math.max(p1.getX(), p2.getX());
+			double minY = Math.min(p1.getY(), p2.getY());
+			double maxY = Math.max(p1.getY(), p2.getY());
+
+			if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
+				double A = p1.getY() - p2.getY();
+				double B = p2.getX() - p1.getX();
+				double C = p1.getX() * p2.getY() - p2.getX() * p1.getY();
+
+				double distance = Math.abs(A * x + B * y + C) / Math.sqrt(A * A + B * B);
+
+				if (distance < 3) {
+				    return true;
+				} else {
+				    return false;
+				}
 			}
 		}
 		return false;

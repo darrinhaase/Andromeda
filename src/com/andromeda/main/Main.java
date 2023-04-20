@@ -12,6 +12,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.font.TextAttribute;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -31,6 +32,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JViewport;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import com.andromeda.desc.DescriptionBar;
+import com.andromeda.desc.DrawingText;
 import com.andromeda.vgraph.GraphGUI;
 import com.andromeda.vgraph.Instruction;
 import com.formdev.flatlaf.FlatIntelliJLaf;
@@ -262,7 +264,7 @@ public class Main {
 					for(Instruction j : graph.findObject(e.getX(), e.getY())) {
 						HashMap<String, Dimension> text = new HashMap<>();
 							text.put(j.getType(), new Dimension(descBar.getWidth()/19, descBar.getHeight()/20));
-						descBar.renderText(text);
+						descBar.renderText(new DrawingText(descBar.getWidth()/19, descBar.getHeight()/20, 30, j.getType(), TextAttribute.WEIGHT_EXTRABOLD), true);
 						
 						tabbedPane.setBounds(screen.width/5+screen.width/170, screen.height/35, Math.round(frame.getWidth()/1.25f)-frame.getWidth()/50, frame.getHeight()-frame.getHeight()/8);
 						tabbedPane.repaint();
@@ -374,9 +376,7 @@ public class Main {
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				for(Instruction j : newGraph.findObject(e.getX(), e.getY())) {
-					HashMap<String, Dimension> text = new HashMap<>();
-						text.put(j.getType(), new Dimension(50, 50));
-					descBar.renderText(text);
+					descBar.renderText(new DrawingText(descBar.getWidth()/19, descBar.getHeight()/20, 30, j.getType(), TextAttribute.WEIGHT_EXTRABOLD), true);
 					descBar.repaint();
 				}
 			}
