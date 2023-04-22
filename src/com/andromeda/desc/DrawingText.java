@@ -4,6 +4,7 @@ public class DrawingText {
 	
 	private int x,y,size;
 	private float boldness;
+	private boolean italics;
 	private String text;
 	
 	public DrawingText(int x, int y, int size, String text, float boldness) {
@@ -12,6 +13,15 @@ public class DrawingText {
 		this.size = size;
 		this.text = text;
 		this.boldness = boldness;
+	}
+	
+	public DrawingText(int x, int y, int size, String text, float boldness, boolean italics) {
+		this.x = x;
+		this.y = y;
+		this.size = size;
+		this.text = text;
+		this.boldness = boldness;
+		this.italics = italics;
 	}
 	
 	public int getX() {
@@ -43,5 +53,11 @@ public class DrawingText {
 	}
 	public void setText(String text) {
 		this.text = text;
+	}
+	public boolean isItalics() {
+		return this.italics;
+	}
+	public void setItalics(boolean italics) {
+		this.italics = italics;
 	}
 }

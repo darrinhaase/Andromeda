@@ -44,10 +44,11 @@ public class Main {
 	private static GraphGUI currentGraph;
 	private static JTabbedPane tabbedPane;
 	private static DescriptionBar descBar = new DescriptionBar(screen);
+	public static JFrame frame = null;
 	
 	public static void main(String[] args) throws Exception {
 
-			JFrame frame = trusty.frame("Jesuit Geometry - Andromeda", screen.width/2, screen.height, null, false);
+			frame = trusty.frame("Jesuit Geometry - Andromeda", screen.width/2, screen.height, null, false);
 			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			frame.setVisible(true);
 			frame.addKeyListener(new KeyListener() {
@@ -262,16 +263,21 @@ public class Main {
 				@Override
 				public void mouseMoved(MouseEvent e) {
 					for(Instruction j : graph.findObject(e.getX(), e.getY())) {
-						HashMap<String, Dimension> text = new HashMap<>();
-							text.put(j.getType(), new Dimension(descBar.getWidth()/19, descBar.getHeight()/20));
-						descBar.renderText(new DrawingText(descBar.getWidth()/19, descBar.getHeight()/20, 30, j.getType(), TextAttribute.WEIGHT_EXTRABOLD), true);
 						
-						tabbedPane.setBounds(screen.width/5+screen.width/170, screen.height/35, Math.round(frame.getWidth()/1.25f)-frame.getWidth()/50, frame.getHeight()-frame.getHeight()/8);
-						tabbedPane.repaint();
+						String definitionText = "";
 						
-						frame.getContentPane().add(descBar);
-						descBar.repaint();
+						switch(j.getType()) {
 						
+							case "Point":
+								definitionText = "A structure on a plane with no location, dimension, or position";
+								break;
+						
+						}
+						
+						descBar.renderText(new DrawingText(descBar.getWidth()/24, descBar.getHeight()/20, (int) (screen.getWidth()/50), j.getType(), TextAttribute.WEIGHT_BOLD), true);
+						descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/9), (int) (screen.getWidth()/100), "Definition: "+definitionText, TextAttribute.WEIGHT_SEMIBOLD, true), false);
+					
+						toggleDescriptionBar(true);
 					}
 				}
 				
@@ -376,8 +382,21 @@ public class Main {
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				for(Instruction j : newGraph.findObject(e.getX(), e.getY())) {
-					descBar.renderText(new DrawingText(descBar.getWidth()/19, descBar.getHeight()/20, 30, j.getType(), TextAttribute.WEIGHT_EXTRABOLD), true);
-					descBar.repaint();
+					
+					String definitionText = "";
+					
+					switch(j.getType()) {
+					
+						case "Point":
+							definitionText = "A structure on a plane with no location, dimension, or position";
+							break;
+					
+					}
+					
+					descBar.renderText(new DrawingText(descBar.getWidth()/24, descBar.getHeight()/20, (int) (screen.getWidth()/50), j.getType(), TextAttribute.WEIGHT_BOLD), true);
+					descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/9), (int) (screen.getWidth()/100), "Definition: "+definitionText, TextAttribute.WEIGHT_SEMIBOLD, true), false);
+				
+					toggleDescriptionBar(true);
 				}
 			}
 			
@@ -393,5 +412,21 @@ public class Main {
 			sP.setBorder(null);
 		
 		return sP;
+	}
+	
+	public static void toggleDescriptionBar(boolean active) {
+		if (active) {
+			tabbedPane.setBounds(screen.width/5+screen.width/170, screen.height/35, Math.round(frame.getWidth()/1.25f)-frame.getWidth()/50, frame.getHeight()-frame.getHeight()/8);
+			tabbedPane.repaint();
+			
+			frame.getContentPane().add(descBar);
+			descBar.paintComponents(descBar.getGraphics());
+		} else {
+			tabbedPane.setBounds(screen.width/49, screen.height/45, Math.round(frame.getWidth()/1.05f), frame.getHeight()-frame.getHeight()/8);
+			tabbedPane.repaint();
+			
+			frame.getContentPane().remove(descBar);
+			frame.repaint();
+		}
 	}
 }
