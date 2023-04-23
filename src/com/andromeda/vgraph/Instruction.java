@@ -12,7 +12,7 @@ public class Instruction implements Serializable {
 	private PlotPoint p1,p2;
 	
 	public boolean isColliding(int x, int y) {
-		if (p1 == null && p2 == null) {
+		if (this.type.equals("Point")) {
 			Rectangle bound = new Rectangle(this.x, this.y, r, r);
 			if (bound.contains(x,y)) return true;
 			else return false;

@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import javax.swing.JPanel;
 import com.andromeda.main.Main;
 import com.andromeda.main.trusty;
@@ -18,7 +17,6 @@ public class GraphGUI extends JPanel {
 	public boolean saved = true;
 	public File saveFile = null;
 	private ArrayList<Instruction> instructions = new ArrayList<>();
-	private HashMap<String, PlotPoint> plots = new HashMap<>();
 	private int naming = 0;
 	
 	public ArrayList<Instruction> getInstructions() {
@@ -36,23 +34,16 @@ public class GraphGUI extends JPanel {
 	}
 	
 	public void drawCircle(int x, int y, int r, String name) {
-		x = x-(r/2);
-		y = y-(r/2);
-		
-		Instruction tempInstruction = new Instruction(x, y, name, String.valueOf(naming));
+		Instruction tempInstruction = new Instruction(x-(r/2), y-(r/2), name, String.valueOf(naming));
+			tempInstruction.setP1(new PlotPoint(x, y));
 			tempInstruction.setFilled(true);
 			tempInstruction.setRadius(r);
 			
+			
 		instructions.add(tempInstruction);
-	}
-
-	public void plot(String name, int x, int y) {
-		plots.put(name, new PlotPoint(x, y));
-		drawCircle(x,y,Main.screen.width/180, "Point");
 	}
 	
 	public void plot(int x, int y) {
-		plots.put(trusty.str(naming), new PlotPoint(x, y));
 		drawCircle(x,y,Main.screen.width/180, "Point");
 		if (naming == 1) {
 			drawLine(trusty.str(naming-1), trusty.str(naming));
@@ -61,8 +52,13 @@ public class GraphGUI extends JPanel {
 	}
 	
 	public void drawLine(String p1, String p2) {
-		PlotPoint point1 = plots.get(p1);
-		PlotPoint point2 = plots.get(p2);
+		PlotPoint point1 = null;
+		PlotPoint point2 = null;
+		
+		for (Instruction i : instructions) {
+			if (i.getName().equals(p1)) point1 = i.getP1();
+			else if (i.getName().equals(p2)) point2 = i.getP1();
+		}
 		
 		Instruction tempInstruction = new Instruction(point1, point2, "Line", String.valueOf(naming));
 		instructions.add(tempInstruction);
