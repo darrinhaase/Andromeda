@@ -35,10 +35,8 @@ public class GraphGUI extends JPanel {
 	
 	public void drawCircle(int x, int y, int r, String name) {
 		Instruction tempInstruction = new Instruction(x-(r/2), y-(r/2), name, String.valueOf(naming));
-			tempInstruction.setP1(new PlotPoint(x, y));
 			tempInstruction.setFilled(true);
 			tempInstruction.setRadius(r);
-			
 			
 		instructions.add(tempInstruction);
 	}
@@ -56,8 +54,8 @@ public class GraphGUI extends JPanel {
 		PlotPoint point2 = null;
 		
 		for (Instruction i : instructions) {
-			if (i.getName().equals(p1)) point1 = i.getP1();
-			else if (i.getName().equals(p2)) point2 = i.getP1();
+			if (i.getName().equals(p1)) point1 = new PlotPoint(i.getX()+(i.getRadius()/2), i.getY()+(i.getRadius()/2));
+			else if (i.getName().equals(p2)) point2 = new PlotPoint(i.getX()+(i.getRadius()/2), i.getY()+(i.getRadius()/2));
 		}
 		
 		Instruction tempInstruction = new Instruction(point1, point2, "Line", String.valueOf(naming));

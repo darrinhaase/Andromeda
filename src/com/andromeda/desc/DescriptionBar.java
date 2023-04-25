@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-
 import com.andromeda.main.Main;
 
 @SuppressWarnings("serial")
@@ -47,6 +46,7 @@ public class DescriptionBar extends JPanel {
 	
 	public void renderText(DrawingText text, boolean clear) {
 		if (clear) {
+			this.removeAll();
 			for (JTextArea j : texts) {
 				this.remove(j);
 			}
@@ -65,10 +65,14 @@ public class DescriptionBar extends JPanel {
 			}
 			this.textToDraw.clear();
 			this.texts.clear();
+			this.removeAll();
 		}
 		
-		for (DrawingText i : textToDraw) {
+		
+		//Necessary to reverse the order of the index so everything is painted in the correct order
+		for (int l = textToDraw.size()-1; l >= 0; l--) {
 			Font customFont = null;
+			DrawingText i = textToDraw.get(l);
 			
 			if (i.isItalics()) {
 				customFont = new Font("Sans", Font.ITALIC, i.getSize());
@@ -96,7 +100,6 @@ public class DescriptionBar extends JPanel {
 		    
 		    
 		    this.add(textArea);
-		    this.setComponentZOrder(textArea, 0);
 		    this.repaint();
 		}
 	}

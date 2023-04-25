@@ -39,6 +39,14 @@ public class Instruction implements Serializable {
 		return false;
 	}
 	
+	public double[] getLineData() {
+		double A = p1.getY() - p2.getY();
+		double B = p2.getX() - p1.getX();
+		double C = p1.getX() * p2.getY() - p2.getX() * p1.getY();
+		
+		return new double[] {A,B,C};
+	}
+	
 	public Instruction(int x, int y, String type, String name) {
 		this.x = x;
 		this.y = y;
