@@ -1,7 +1,10 @@
 package com.andromeda.vgraph;
 
-public class PlotPoint {
+import java.io.Serializable;
 
+public class PlotPoint implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private int x, y;
 
 	public int getX() {
