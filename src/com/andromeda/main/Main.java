@@ -349,7 +349,11 @@ public class Main {
 										j.setY(Integer.valueOf(yField.getText()+e.getKeyChar()));
 									}
 								} catch (NumberFormatException e2) {
-									if (removeLastChar(yField.getText()).equals("")) {
+									try {
+										if (removeLastChar(yField.getText()).equals("")) {
+											j.setY(0);
+										}
+									}  catch (NullPointerException e3) {
 										j.setY(0);
 									}
 								} catch (NullPointerException e2) {
