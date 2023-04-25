@@ -235,6 +235,7 @@ public class Main {
 				JScrollPane s = (JScrollPane) tabbedPane.getSelectedComponent();
 				JViewport viewport = s.getViewport(); 
 				currentGraph = (GraphGUI) viewport.getView();
+				toggleDescriptionBar(false);
 			});
 			
 			tabbedPane.setBounds(screen.width/49, screen.height/45, Math.round(frame.getWidth()/1.05f), frame.getHeight()-frame.getHeight()/8);
@@ -299,7 +300,11 @@ public class Main {
 										j.setX(Integer.valueOf(xField.getText()+e.getKeyChar()));
 									}
 								} catch (NumberFormatException e2) {
-									if (removeLastChar(xField.getText()).equals("")) {
+									try {
+										if (removeLastChar(xField.getText()).equals("")) {
+											j.setX(0);
+										}
+									}  catch (NullPointerException e3) {
 										j.setX(0);
 									}
 								} catch (NullPointerException e2) {
@@ -464,6 +469,8 @@ public class Main {
 	}
 	
 	private static JScrollPane newTab() throws Exception {
+		toggleDescriptionBar(false);
+		
 		GraphGUI newGraph = new GraphGUI(screen.width/5, -screen.height/25, 15*screen.width, 10*screen.height);
 		
 		newGraph.addMouseListener(new MouseListener() {
@@ -506,13 +513,127 @@ public class Main {
 					
 					}
 					
-					descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/9, (int) (screen.getWidth()/100), "Definition: "+definitionText, TextAttribute.WEIGHT_SEMIBOLD, true), false);
 				
-					descBar.renderText(new DrawingText(descBar.getWidth()/24, descBar.getHeight()/2, (int) (screen.getWidth()/100), "testing", TextAttribute.WEIGHT_SEMIBOLD), false);
+					descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/9, (int) (screen.getWidth()/100), "Definition: "+definitionText, TextAttribute.WEIGHT_SEMIBOLD, true), false);
 					
+					descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/5, (int) (screen.getWidth()/100), "X: ", TextAttribute.WEIGHT_SEMIBOLD), false);
+					descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/4, (int) (screen.getWidth()/100), "Y: ", TextAttribute.WEIGHT_SEMIBOLD), false);
+					
+					
+					
+					JTextField xField = new JTextField();
+					xField.setText(trusty.str(j.getX()));
+					xField.setBounds((int) descBar.getWidth()/7, (int) Math.round(descBar.getHeight()/5.31), (int) screen.getWidth()/13, (int) screen.getHeight()/36);
+					xField.addKeyListener(new KeyListener() {
+						public void keyTyped(KeyEvent e) {}
+						public void keyReleased(KeyEvent e) {}
+						public void keyPressed(KeyEvent e) {
+							int oldX = j.getX();
+							
+							try {
+								if (e.getKeyCode() == 8) {
+									j.setX(Integer.valueOf(removeLastChar(xField.getText())));
+								} else {
+									j.setX(Integer.valueOf(xField.getText()+e.getKeyChar()));
+								}
+							} catch (NumberFormatException e2) {
+								try {
+									if (removeLastChar(xField.getText()).equals("")) {
+										j.setX(0);
+									}
+								}  catch (NullPointerException e3) {
+									j.setX(0);
+								}
+							} catch (NullPointerException e2) {
+								;
+							}
+							
+							if (j.getType().equals("Point")) {
+								ArrayList<Instruction> replacementInstructions = new ArrayList<>();
+								for (Instruction i : newGraph.getInstructions()) {
+									
+									if (i.getType().equals("Line")) {
+										if (i.getP1().getX()-(screen.width/180/2) == oldX || i.getP2().getX()-(screen.width/180/2) == oldX && i.getP1().getY()-(screen.width/180/2) == j.getY() || i.getP2().getY()-(screen.width/180/2) == j.getY()) {
+											if (i.getP1().getX()-(screen.width/180/2) == oldX) {
+												replacementInstructions.add(new Instruction(new PlotPoint(j.getX()+(screen.width/180/2), j.getY()+(screen.width/180/2)), i.getP2(), "Line", i.getName()));
+											} else {
+												replacementInstructions.add(new Instruction(i.getP1(), new PlotPoint(j.getX()+(screen.width/180/2), j.getY()+(screen.width/180/2)), "Line", i.getName()));
+											}
+										} else {
+											replacementInstructions.add(i);
+										}
+									} else {
+										replacementInstructions.add(i);
+									}
+								}
+								newGraph.setInstructions(replacementInstructions);
+							}
+							
+							frame.repaint();
+							newGraph.repaint();
+							newGraph.paintComponent(newGraph.getGraphics());
+						}
+					});
+					descBar.add(xField);
+					
+					JTextField yField = new JTextField();
+					yField.setText(trusty.str(j.getY()));
+					yField.setBounds((int) descBar.getWidth()/7, (int) Math.round(descBar.getHeight()/4.2), (int) screen.getWidth()/13, (int) screen.getHeight()/36);
+					yField.addKeyListener(new KeyListener() {
+						public void keyTyped(KeyEvent e) {}
+						public void keyReleased(KeyEvent e) {}
+						public void keyPressed(KeyEvent e) {
+							int oldY = j.getY();
+							try {
+								if (e.getKeyCode() == 8) {
+									j.setY(Integer.valueOf(removeLastChar(yField.getText())));
+								} else {
+									j.setY(Integer.valueOf(yField.getText()+e.getKeyChar()));
+								}
+							} catch (NumberFormatException e2) {
+								try {
+									if (removeLastChar(yField.getText()).equals("")) {
+										j.setY(0);
+									}
+								}  catch (NullPointerException e3) {
+									j.setY(0);
+								}
+							} catch (NullPointerException e2) {
+								;
+							}
+							
+							if (j.getType().equals("Point")) {
+								ArrayList<Instruction> replacementInstructions = new ArrayList<>();
+								for (Instruction i : newGraph.getInstructions()) {
+									
+									if (i.getType().equals("Line")) {
+										if (i.getP1().getX()-(screen.width/180/2) == j.getX() || i.getP2().getX()-(screen.width/180/2) == j.getX() && i.getP1().getY()-(screen.width/180/2) == oldY || i.getP2().getY()-(screen.width/180/2) == oldY) {
+											if (i.getP1().getX()-(screen.width/180/2) == j.getX()) {
+												replacementInstructions.add(new Instruction(new PlotPoint(j.getX()+(screen.width/180/2), j.getY()+(screen.width/180/2)), i.getP2(), "Line", i.getName()));
+											} else {
+												replacementInstructions.add(new Instruction(i.getP1(), new PlotPoint(j.getX()+(screen.width/180/2), j.getY()+(screen.width/180/2)), "Line", i.getName()));
+											}
+										} else {
+											replacementInstructions.add(i);
+										}
+									} else {
+										replacementInstructions.add(i);
+									}
+								}
+								newGraph.setInstructions(replacementInstructions);
+							}
+							
+							frame.repaint();
+							newGraph.repaint();
+							newGraph.paintComponent(newGraph.getGraphics());
+						}
+					});
+					
+					descBar.add(yField);
 					
 					toggleDescriptionBar(true);
 				}
+				frame.repaint();
 			}
 			
 			@Override
