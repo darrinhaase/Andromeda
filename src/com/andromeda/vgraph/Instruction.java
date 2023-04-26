@@ -9,6 +9,7 @@ public class Instruction implements Serializable {
 	private int x, y, r;
 	private String type,name;
 	private boolean filled;
+	private PlotPoint[] pList;
 	private PlotPoint p1,p2;
 	
 	public boolean isColliding(int x, int y) {
@@ -16,7 +17,7 @@ public class Instruction implements Serializable {
 			Rectangle bound = new Rectangle(this.x, this.y, r, r);
 			if (bound.contains(x,y)) return true;
 			else return false;
-		} else {
+		} else if (this.type.equals("Line")) {
 			double minX = Math.min(p1.getX(), p2.getX());
 			double maxX = Math.max(p1.getX(), p2.getX());
 			double minY = Math.min(p1.getY(), p2.getY());
@@ -57,6 +58,12 @@ public class Instruction implements Serializable {
 	public Instruction(PlotPoint p1, PlotPoint p2, String type, String name) {
 		this.p1 = p1;
 		this.p2 = p2;
+		this.type = type;
+		this.name = name;
+	}
+	
+	public Instruction(String type, String name, PlotPoint... plotList) {
+		this.pList = plotList;
 		this.type = type;
 		this.name = name;
 	}

@@ -33,19 +33,66 @@ public class GraphGUI extends JPanel {
 		this.setPreferredSize(size);
 	}
 	
-	public void drawCircle(int x, int y, int r, String name) {
+	private void drawCircle(int x, int y, int r, String name, boolean filled) {
 		Instruction tempInstruction = new Instruction(x-(r/2), y-(r/2), name, String.valueOf(naming));
-			tempInstruction.setFilled(true);
+			tempInstruction.setFilled(filled);
 			tempInstruction.setRadius(r);
 			
 		instructions.add(tempInstruction);
 	}
 	
 	public void plot(int x, int y) {
-		drawCircle(x,y,Main.screen.width/180, "Point");
+		drawCircle(x,y,Main.screen.width/180, "Point", true);
 		if (naming == 1) {
-			drawLine(trusty.str(naming-1), trusty.str(naming));
+			drawCircle(trusty.str(naming-1), trusty.str(naming));
 		}
+		naming++;
+	}
+	
+	//Use this outside of class for ease of use
+	public void drawCircle(String midPoint, String outerPoint) {
+		PlotPoint mid = null;
+		PlotPoint out = null;
+		
+		for (Instruction i : instructions) {
+			if (i.getName().equals(midPoint)) mid = new PlotPoint(i.getX()+(i.getRadius()/2), i.getY()+(i.getRadius()/2));
+			else if (i.getName().equals(outerPoint)) out = new PlotPoint(i.getX()+(i.getRadius()/2), i.getY()+(i.getRadius()/2));
+		}
+		
+		drawCircle(mid.getX(), mid.getY(), (int) Math.round(calculateDistance(mid.getX(), mid.getY(), out.getX(), out.getY()))*2, "Circle", false);
+	}
+	
+	public void drawRectangle(String p1, String p2, String p3, String p4) {
+		PlotPoint point1 = null;
+		PlotPoint point2 = null;
+		PlotPoint point3 = null;
+		PlotPoint point4 = null;
+		
+		for (Instruction i : instructions) {
+			if (i.getName().equals(p1)) point1 = new PlotPoint(i.getX()+(i.getRadius()/2), i.getY()+(i.getRadius()/2));
+			else if (i.getName().equals(p2)) point2 = new PlotPoint(i.getX()+(i.getRadius()/2), i.getY()+(i.getRadius()/2));
+			else if (i.getName().equals(p3)) point3 = new PlotPoint(i.getX()+(i.getRadius()/2), i.getY()+(i.getRadius()/2));
+			else if (i.getName().equals(p4)) point4 = new PlotPoint(i.getX()+(i.getRadius()/2), i.getY()+(i.getRadius()/2));
+		}
+		
+		Instruction tempInstruction = new Instruction("Rectangle", String.valueOf(naming), point1, point2, point3, point4);
+		instructions.add(tempInstruction);
+		naming++;
+	}
+	
+	public void drawTriangle(String p1, String p2, String p3) {
+		PlotPoint point1 = null;
+		PlotPoint point2 = null;
+		PlotPoint point3 = null;
+		
+		for (Instruction i : instructions) {
+			if (i.getName().equals(p1)) point1 = new PlotPoint(i.getX()+(i.getRadius()/2), i.getY()+(i.getRadius()/2));
+			else if (i.getName().equals(p2)) point2 = new PlotPoint(i.getX()+(i.getRadius()/2), i.getY()+(i.getRadius()/2));
+			else if (i.getName().equals(p3)) point3 = new PlotPoint(i.getX()+(i.getRadius()/2), i.getY()+(i.getRadius()/2));
+		}
+		
+		Instruction tempInstruction = new Instruction("Triangle", String.valueOf(naming), point1, point2, point3);
+		instructions.add(tempInstruction);
 		naming++;
 	}
 	
@@ -71,6 +118,12 @@ public class GraphGUI extends JPanel {
 			}
 		}
 		return possibleObjects;
+	}
+	
+	public double calculateDistance(int x1, int y1, int x2, int y2) {
+	    int deltaX = x2 - x1;
+	    int deltaY = y2 - y1;
+	    return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 	}
 	
 	@Override
