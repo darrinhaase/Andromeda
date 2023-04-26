@@ -6,7 +6,7 @@ import java.io.Serializable;
 public class Instruction implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private int x, y, r;
+	private int x, y, d;
 	private String type,name;
 	private boolean filled;
 	private PlotPoint[] pList;
@@ -14,7 +14,7 @@ public class Instruction implements Serializable {
 	
 	public boolean isColliding(int x, int y) {
 		if (this.type.equals("Point")) {
-			Rectangle bound = new Rectangle(this.x, this.y, r, r);
+			Rectangle bound = new Rectangle(this.x, this.y, d, d);
 			if (bound.contains(x,y)) return true;
 			else return false;
 		} else if (this.type.equals("Line")) {
@@ -103,11 +103,11 @@ public class Instruction implements Serializable {
 	public void setY(int y) {
 		this.y = y;
 	}
-	public int getRadius() {
-		return r;
+	public int getDiameter() {
+		return d;
 	}
-	public void setRadius(int r) {
-		this.r = r;
+	public void setDiameter(int d) {
+		this.d = d;
 	}
 	public boolean getFilled() {
 		return filled;
