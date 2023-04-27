@@ -17,7 +17,7 @@ public class GraphGUI extends JPanel {
 	public boolean saved = true;
 	public File saveFile = null;
 	private ArrayList<Instruction> instructions = new ArrayList<>();
-	private int naming = 0;
+	private int naming = 1;
 	
 	public ArrayList<Instruction> getInstructions() {
 		return instructions;
@@ -33,18 +33,14 @@ public class GraphGUI extends JPanel {
 		this.setPreferredSize(size);
 	}
 	
-	private void drawCircle(int x, int y, int diameter, String name, boolean filled) {
-		Instruction tempInstruction = new Instruction(x-(diameter/2), y-(diameter/2), name, String.valueOf(naming));
-			tempInstruction.setFilled(filled);
-			tempInstruction.setDiameter(diameter);
-			
-		instructions.add(tempInstruction);
-	}
-	
 	public void plot(int x, int y) {
-		drawCircle(x,y,Main.screen.width/180, "Point", true);
-		if (naming == 1) {
-			drawCircle(trusty.str(naming-1), trusty.str(naming));
+		Instruction tempInstruction = new Instruction(x-(Main.screen.width/180/2), y-(Main.screen.width/180/2), "Point", String.valueOf(naming));
+		tempInstruction.setFilled(true);
+		tempInstruction.setDiameter(Main.screen.width/180);
+	
+	instructions.add(tempInstruction);
+		if (naming % 2 == 0) {
+			drawLine(trusty.str(naming-1), trusty.str(naming));
 		}
 		naming++;
 	}
@@ -59,7 +55,13 @@ public class GraphGUI extends JPanel {
 			else if (i.getName().equals(outerPoint)) out = new PlotPoint(i.getX()+(i.getDiameter()/2), i.getY()+(i.getDiameter()/2));
 		}
 		
-		drawCircle(mid.getX(), mid.getY(), (int) Math.round(calculateDistance(mid.getX(), mid.getY(), out.getX(), out.getY()))*2, "Circle", false);
+		int diameter = (int) Math.round(calculateDistance(mid.getX(), mid.getY(), out.getX(), out.getY()))*2;
+		
+		Instruction tempInstruction = new Instruction(mid.getX()-(diameter/2), mid.getY()-(diameter/2), "Circle", String.valueOf(naming));
+			tempInstruction.setFilled(false);
+			tempInstruction.setDiameter(diameter);
+		
+		instructions.add(tempInstruction);
 	}
 	
 	public void drawRectangle(String p1, String p2, String p3, String p4) {
@@ -105,7 +107,7 @@ public class GraphGUI extends JPanel {
 			else if (i.getName().equals(p2)) point2 = new PlotPoint(i.getX()+(i.getDiameter()/2), i.getY()+(i.getDiameter()/2));
 		}
 		
-		Instruction tempInstruction = new Instruction(point1, point2, "Line", String.valueOf(naming));
+		Instruction tempInstruction = new Instruction(point1, point2, "Segment", String.valueOf(naming));
 		instructions.add(tempInstruction);
 		naming++;
 	}
@@ -138,7 +140,7 @@ public class GraphGUI extends JPanel {
 		for (Instruction i : instructions) {
 			switch(i.getType()) {
 			
-			case "Line":
+			case "Segment":
 			    g2.setStroke(new BasicStroke(3));
 				g2.drawLine(i.getP1().getX(), i.getP1().getY(), i.getP2().getX(), i.getP2().getY());
 				break;
@@ -159,5 +161,6 @@ public class GraphGUI extends JPanel {
 			    break;
 			}
 		}
+		g.dispose();
 	}
 }
