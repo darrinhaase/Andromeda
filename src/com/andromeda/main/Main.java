@@ -276,6 +276,9 @@ public class Main {
 							case "Point":
 								definitionText = "A structure on a plane with no location, dimension, or position";
 								break;
+							case "Segment":
+								definitionText = "One dimensional structure between two points";
+								break;
 						
 						}
 						
@@ -430,6 +433,7 @@ public class Main {
 			  
 			  ObjectInputStream objin = new ObjectInputStream(new FileInputStream(selectedFile));
 			  currentGraph.setInstructions((ArrayList<Instruction>) objin.readObject());
+			  
 			  objin.close();
 			  currentGraph.repaint();
 			  frame.repaint();
