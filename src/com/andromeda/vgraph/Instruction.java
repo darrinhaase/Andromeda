@@ -17,7 +17,7 @@ public class Instruction implements Serializable {
 			Rectangle bound = new Rectangle(this.x, this.y, d, d);
 			if (bound.contains(x,y)) return true;
 			else return false;
-		} else if (this.type.equals("Line")) {
+		} else if (this.type.equals("Segment")) {
 			double minX = Math.min(p1.getX(), p2.getX());
 			double maxX = Math.max(p1.getX(), p2.getX());
 			double minY = Math.min(p1.getY(), p2.getY());
