@@ -3,6 +3,7 @@ package com.andromeda.main;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.*;
 import java.net.http.HttpClient;
@@ -57,8 +58,14 @@ public class trusty implements ActionListener {
 		
 		else {
 			
-			frame.setIconImage(new ImageIcon(imagepath).getImage());
-
+			try {
+				
+				frame.setIconImage(ImageIO.read(trusty.class.getResource(imagepath)));
+				
+			} catch (IOException e) {
+				
+			}
+			
 		}
 		
 		return frame;
@@ -67,10 +74,11 @@ public class trusty implements ActionListener {
 	
 	
 	//Label Method
-	public static JLabel label(String name, String words, int x, int y, int width, int height) {
+	public static JLabel label(String name, String words, int x, int y, int width, int height, Font font) {
 
 		JLabel label = new JLabel(words);
 		label.setName(name);
+		label.setFont(font);
 		label.setBounds(x, y, width, height);
 		frame.getContentPane().add(label);
 		
@@ -99,6 +107,14 @@ public class trusty implements ActionListener {
 		return pane;
 	}
 	
+	public static BufferedImage resizeImage(String path, int targetWidth, int targetHeight) throws IOException {
+	    BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+	    Graphics2D graphics2D = resizedImage.createGraphics();
+	    graphics2D.drawImage(ImageIO.read(new File(path)), 0, 0, targetWidth, targetHeight, null);
+	    graphics2D.dispose();
+	    return resizedImage;
+	}
+	
 	
 	//Picture Label Method
 	public static JLabel piclabel(String name, String words, int x, int y, int width, int height, String imagepath) {
@@ -106,18 +122,20 @@ public class trusty implements ActionListener {
 		JLabel piclabel = new JLabel(words);
 		piclabel.setName(name);
 		piclabel.setBounds(x, y, width, height);
-		frame.getContentPane().add(piclabel);
-		try {
-			
-			piclabel.setIcon(new ImageIcon(ImageIO.read(trusty.class.getResource(imagepath))));
-			
-		} catch (IOException e) {
-
-		}
-		
+		piclabel.setIcon(new ImageIcon(imagepath));
+				
 		return piclabel;
 	}
 	
+	public static JLabel piclabel(String name, String words, int x, int y, int width, int height, BufferedImage img) {
+		
+		JLabel piclabel = new JLabel(words);
+		piclabel.setName(name);
+		piclabel.setBounds(x, y, width, height);
+		piclabel.setIcon(new ImageIcon(img));
+				
+		return piclabel;
+	}
 	
 	//Button Method
 	public static JButton button(String name, String words, int x, int y, int width, int height, methodAddition ma) {
@@ -282,16 +300,16 @@ public class trusty implements ActionListener {
 	 * !!!!!!!
 	 */
 	
-	public static class physics {
+	public class physics {
 		
 		@SuppressWarnings("unused")
-		private  double WIDTH, HEIGHT, FRICTION, SPEED;
-		private  HashMap<String, ArrayList<String>> objects = new HashMap<>();
-		private  HashMap<String, ArrayList<String>> barriers = new HashMap<>();
-		private  ArrayList<String> currentData = new ArrayList<>();
+		private static double WIDTH, HEIGHT, FRICTION, SPEED;
+		private static HashMap<String, ArrayList<String>> objects = new HashMap<>();
+		private static HashMap<String, ArrayList<String>> barriers = new HashMap<>();
+		private static ArrayList<String> currentData = new ArrayList<>();
 		
 		
-		public  void createPhysics(int windowWidth, int windowHeight, double frictionOnSurface) {
+		public static void createPhysics(int windowWidth, int windowHeight, double frictionOnSurface) {
 			WIDTH = windowWidth;
 			HEIGHT = windowHeight;
 			FRICTION = frictionOnSurface;
@@ -300,18 +318,18 @@ public class trusty implements ActionListener {
 		
 		
 		
-		private  double currentObjectMass = 0;
-		private  int currentObjectWidth = 0;
-		private  int currentObjectHeight = 0;
-		private  double currentXVel = 0;
-		private  double currentYVel = 0;
-		private  double currentObjectFriction = 0;
-		private  Component currentObject;
-		private  boolean xHit = false;
-		private  boolean yHit = false;
+		private static double currentObjectMass = 0;
+		private static int currentObjectWidth = 0;
+		private static int currentObjectHeight = 0;
+		private static double currentXVel = 0;
+		private static double currentYVel = 0;
+		private static double currentObjectFriction = 0;
+		private static Component currentObject;
+		private static boolean xHit = false;
+		private static boolean yHit = false;
 		
 		
-		public  void startComponentMotion(Component object, double dx, double dy, int speedControlX, int speedControlY) {
+		public static void startComponentMotion(Component object, double dx, double dy, int speedControlX, int speedControlY) {
 			ArrayList<String> objectDetails = objects.get(object.getName());
 			
 			currentObject = object;
@@ -426,7 +444,7 @@ public class trusty implements ActionListener {
 		
 		
 		
-		public  void addPhysics(Component object, double mass) {
+		public static void addPhysics(Component object, double mass) {
 			
 			if (currentData.size() != 0) {	
 				currentData.remove(currentData.size()-1);
@@ -441,7 +459,7 @@ public class trusty implements ActionListener {
 		
 		
 		
-		public  void addBarrierObject(Component barrier, boolean movable, int mass) {
+		public static void addBarrierObject(Component barrier, boolean movable, int mass) {
 			if (currentData.size() != 0) {
 				currentData.remove(currentData.size()-1);
 			}
@@ -454,7 +472,7 @@ public class trusty implements ActionListener {
 		}
 		
 		
-		public  void testForCollisions() {
+		public static void testForCollisions() {
 			
 			
 			
@@ -462,7 +480,7 @@ public class trusty implements ActionListener {
 		
 		
 		
-		public boolean intersects(Component object1, Component object2) {
+		public static boolean intersects(Component object1, Component object2) {
 			
 			int object1Width = object1.getWidth();
 	        int object1Height = object1.getHeight();
@@ -499,7 +517,7 @@ public class trusty implements ActionListener {
 	//Testing Class
 	public class TestAssist {
 		
-		public <T> boolean assertEquals(T expected, T actual) {
+		public static<T> boolean assertEquals(T expected, T actual) {
 			if (expected != actual) { 
 				System.out.println("Test failed!\nExpected: "+expected+"\nActual: "+actual);
 				return false;
@@ -511,7 +529,7 @@ public class trusty implements ActionListener {
 		}
 		
 		
-		public HashMap<String, String> assertSetEquals(ArrayList<?> expectedSet, ArrayList<?> actualSet) {
+		public static HashMap<String, String> assertSetEquals(ArrayList<?> expectedSet, ArrayList<?> actualSet) {
 			
 			HashMap<String, String> failedTests = new HashMap<>();
 			
@@ -542,7 +560,7 @@ public class trusty implements ActionListener {
 	//Requests Class
 	public class Requests {
 		
-		public String get(String url) {
+		public static String get(String url) {
 			try {
 				HttpRequest getReq = HttpRequest.newBuilder()
 						.uri(new URI(url))
@@ -557,7 +575,7 @@ public class trusty implements ActionListener {
 		}
 		
 		
-		public String post(String url, String json) throws IOException {
+		public static String post(String url, String json) throws IOException {
 			URL uri = new URL(url);
 			URLConnection con = uri.openConnection();
 			HttpURLConnection http = (HttpURLConnection)con;
@@ -588,11 +606,11 @@ public class trusty implements ActionListener {
 		
 		public class server {
 			
-			private  ServerSocket socketConnection = null;
-			private  Socket acceptClient = null;
+			private static ServerSocket socketConnection = null;
+			private static Socket acceptClient = null;
 			
 			
-			public  ServerSocket setup(int port) {
+			public static ServerSocket setup(int port) {
 				try {
 					socketConnection = new ServerSocket(port);
 					acceptClient = socketConnection.accept();
@@ -604,7 +622,7 @@ public class trusty implements ActionListener {
 			
 			
 			
-			public  String getInput() {
+			public static String getInput() {
 				InputStream inputClient;
 				String text = null;
 				try {
@@ -618,7 +636,7 @@ public class trusty implements ActionListener {
 			
 			
 			
-			public  void sendOutput(String text) {
+			public static void sendOutput(String text) {
 				OutputStream output = null;
 				try {
 					output = acceptClient.getOutputStream();
@@ -632,16 +650,16 @@ public class trusty implements ActionListener {
 		
 		public class client {
 			
-			public  Socket connectToServer;
+			public static Socket connectToServer;
 			
-			public  void setup(String ip, int port) {
+			public static void setup(String ip, int port) {
 				try {
 					connectToServer = new Socket(ip, port);
 				}
 				catch (IOException e) {}
 			}
 			
-			public  String getInput() {
+			public static String getInput() {
 				
 				String text = null;
 				
@@ -654,7 +672,7 @@ public class trusty implements ActionListener {
 				return text;
 			}
 			
-			public  void sendOutput(String text) {
+			public static void sendOutput(String text) {
 				OutputStream streamOut = null;
 				try {
 					streamOut = connectToServer.getOutputStream();
@@ -668,10 +686,10 @@ public class trusty implements ActionListener {
  	}
 	
 	public class EncodeDecoder {
-		public  String encode(String text) {
+		public static String encode(String text) {
 			return Base64.getEncoder().encodeToString(text.getBytes());
 		}
-		public  String decode(String text) {
+		public static String decode(String text) {
 			return new String(Base64.getDecoder().decode(text));
 		}
 	}
