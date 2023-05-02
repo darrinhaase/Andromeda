@@ -19,6 +19,11 @@ public class GraphGUI extends JPanel {
 	private ArrayList<Instruction> instructions = new ArrayList<>();
 	private int naming = 1;
 	
+	/*
+	 * DELETE FOR PRODUCTION
+	 */
+	private int plotnum = 1;
+	
 	public ArrayList<Instruction> getInstructions() {
 		return instructions;
 	}
@@ -34,14 +39,16 @@ public class GraphGUI extends JPanel {
 	}
 	
 	public void plot(int x, int y) {
-		Instruction tempInstruction = new Instruction(x-(Main.screen.width/180/2), y-(Main.screen.width/180/2), "Point", String.valueOf(naming));
+		Instruction tempInstruction = new Instruction(x-(Main.screen.width/180/2), y-(Main.screen.width/180/2), "Point", String.valueOf(plotnum));
 		tempInstruction.setFilled(true);
 		tempInstruction.setDiameter(Main.screen.width/180);
 	
-	instructions.add(tempInstruction);
-		if (naming % 2 == 0) {
-			drawLine(trusty.str(naming-1), trusty.str(naming));
+		instructions.add(tempInstruction);
+	
+		if (plotnum % 2 == 0) {
+			drawCircle(trusty.str(plotnum-1), trusty.str(plotnum));
 		}
+		plotnum++;
 		naming++;
 	}
 	

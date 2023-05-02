@@ -420,7 +420,7 @@ public class Main {
 			switch(j.getType()) {
 			
 				case "Point":
-					definitionText = "A structure on a plane with no location, dimension, or position";
+					definitionText = "A named coordinate on a plane";
 					break;
 				case "Segment":
 					definitionText = "One dimensional structure between two points";
@@ -430,119 +430,122 @@ public class Main {
 			
 			descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/9, (int) (screen.getWidth()/100), "Definition: "+definitionText, TextAttribute.WEIGHT_SEMIBOLD, true), false);
 		
-			descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/5, (int) (screen.getWidth()/100), "X: ", TextAttribute.WEIGHT_SEMIBOLD), false);
-			descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/4, (int) (screen.getWidth()/100), "Y: ", TextAttribute.WEIGHT_SEMIBOLD), false);
+			switch(j.getType()) {
 			
-			JTextField xField = new JTextField();
-			xField.setText(trusty.str(j.getX()));
-			xField.setBounds((int) descBar.getWidth()/7, (int) Math.round(descBar.getHeight()/5.31), (int) screen.getWidth()/13, (int) screen.getHeight()/36);
-			xField.addKeyListener(new KeyListener() {
-				public void keyTyped(KeyEvent e) {}
-				public void keyReleased(KeyEvent e) {}
-				public void keyPressed(KeyEvent e) {
-					int oldX = j.getX();
-					
-					try {
-						if (e.getKeyCode() == 8) {
-							j.setX(Integer.valueOf(removeLastChar(xField.getText())));
-						} else {
-							j.setX(Integer.valueOf(xField.getText()+e.getKeyChar()));
-						}
-					} catch (NumberFormatException e2) {
-						try {
-							if (removeLastChar(xField.getText()).equals("")) {
-								j.setX(0);
-							}
-						}  catch (NullPointerException e3) {
-							j.setX(0);
-						}
-					} catch (NullPointerException e2) {
-						;
-					}
-					
-					if (j.getType().equals("Point")) {
-						ArrayList<Instruction> replacementInstructions = new ArrayList<>();
-						for (Instruction i : g.getInstructions()) {
-							
-							if (i.getType().equals("Segment")) {
-								if (i.getP1().getX()-(screen.width/180/2) == oldX || i.getP2().getX()-(screen.width/180/2) == oldX && i.getP1().getY()-(screen.width/180/2) == j.getY() || i.getP2().getY()-(screen.width/180/2) == j.getY()) {
-									if (i.getP1().getX()-(screen.width/180/2) == oldX) {
-										replacementInstructions.add(new Instruction(new PlotPoint(j.getX()+(screen.width/180/2), j.getY()+(screen.width/180/2)), i.getP2(), "Segment", i.getName()));
-									} else {
-										replacementInstructions.add(new Instruction(i.getP1(), new PlotPoint(j.getX()+(screen.width/180/2), j.getY()+(screen.width/180/2)), "Segment", i.getName()));
-									}
-								} else {
-									replacementInstructions.add(i);
-								}
-							} else {
-								replacementInstructions.add(i);
-							}
-						}
-						g.setInstructions(replacementInstructions);
-					}
-					
-					frame.repaint();
-					g.repaint();
-					g.paintComponent(g.getGraphics());
+			case "Point":
+				addXandY(j, g);
+				break;
+			case "Segment":
+				float[] lineData = j.getLineData();
+				double scale = Math.pow(10, 3);
+				
+				descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/5, (int) (screen.getWidth()/100), "Slope-Intercept Form: ", TextAttribute.WEIGHT_BOLD), false);
+				
+				if (lineData == null) {
+					descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/4.3), (int) (screen.getWidth()/100), "Slope cannot be calculated because the X values are identical.", TextAttribute.WEIGHT_SEMIBOLD), false);
+				} else {
+					descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/4.3), (int) (screen.getWidth()/100), "y = "+trusty.str(Math.round(lineData[0]*scale) / scale)+"x + "+trusty.str(Math.round(lineData[1]*scale) / scale), TextAttribute.WEIGHT_SEMIBOLD), false);
+					descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/3.3), (int) (screen.getWidth()/100), "Exact Slope: ", TextAttribute.WEIGHT_BOLD), false);
+					descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.95), (int) (screen.getWidth()/100), trusty.str(Math.round(lineData[2]))+" / "+trusty.str(Math.round(lineData[3])), TextAttribute.WEIGHT_SEMIBOLD), false);		
 				}
-			});
-			descBar.add(xField);
-			
-			JTextField yField = new JTextField();
-			yField.setText(trusty.str(j.getY()));
-			yField.setBounds((int) descBar.getWidth()/7, (int) Math.round(descBar.getHeight()/4.2), (int) screen.getWidth()/13, (int) screen.getHeight()/36);
-			yField.addKeyListener(new KeyListener() {
-				public void keyTyped(KeyEvent e) {}
-				public void keyReleased(KeyEvent e) {}
-				public void keyPressed(KeyEvent e) {
-					int oldY = j.getY();
-					try {
-						if (e.getKeyCode() == 8) {
-							j.setY(Integer.valueOf(removeLastChar(yField.getText())));
-						} else {
-							j.setY(Integer.valueOf(yField.getText()+e.getKeyChar()));
-						}
-					} catch (NumberFormatException e2) {
-						try {
-							if (removeLastChar(yField.getText()).equals("")) {
-								j.setY(0);
-							}
-						}  catch (NullPointerException e3) {
-							j.setY(0);
-						}
-					} catch (NullPointerException e2) {
-						;
-					}
-					
-					if (j.getType().equals("Point")) {
-						ArrayList<Instruction> replacementInstructions = new ArrayList<>();
-						for (Instruction i : g.getInstructions()) {
-							
-							if (i.getType().equals("Segment")) {
-								if (i.getP1().getX()-(screen.width/180/2) == j.getX() || i.getP2().getX()-(screen.width/180/2) == j.getX() && i.getP1().getY()-(screen.width/180/2) == oldY || i.getP2().getY()-(screen.width/180/2) == oldY) {
-									if (i.getP1().getX()-(screen.width/180/2) == j.getX()) {
-										replacementInstructions.add(new Instruction(new PlotPoint(j.getX()+(screen.width/180/2), j.getY()+(screen.width/180/2)), i.getP2(), "Segment", i.getName()));
-									} else {
-										replacementInstructions.add(new Instruction(i.getP1(), new PlotPoint(j.getX()+(screen.width/180/2), j.getY()+(screen.width/180/2)), "Segment", i.getName()));
-									}
-								} else {
-									replacementInstructions.add(i);
-								}
-							} else {
-								replacementInstructions.add(i);
-							}
-						}
-						g.setInstructions(replacementInstructions);
-					}
-					
-					frame.repaint();
-					g.repaint();
-					g.paintComponent(g.getGraphics());
-				}
-			});
-			descBar.add(yField);
+				break;
+		
+			}
 			
 			toggleDescriptionBar(true);
 		}
+	}
+	
+	private static void addXandY(Instruction j, GraphGUI g) {
+		descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/5, (int) (screen.getWidth()/100), "X: ", TextAttribute.WEIGHT_SEMIBOLD), false);
+		descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/4, (int) (screen.getWidth()/100), "Y: ", TextAttribute.WEIGHT_SEMIBOLD), false);
+		
+		JTextField xField = new JTextField();
+		xField.setText(trusty.str(j.getX()));
+		xField.setBounds((int) descBar.getWidth()/7, (int) Math.round(descBar.getHeight()/5.31), (int) screen.getWidth()/13, (int) screen.getHeight()/36);
+		xField.addKeyListener(new KeyListener() {
+			public void keyTyped(KeyEvent e) {}
+			public void keyReleased(KeyEvent e) {
+				int oldX = j.getX();
+				
+				try {
+					if (!xField.getText().equals("")) j.setX(trusty.Int(xField.getText()));
+					else j.setX(0);
+				} catch(NumberFormatException e1) {
+					;
+				}
+				
+				if (j.getType().equals("Point")) {
+					ArrayList<Instruction> replacementInstructions = new ArrayList<>();
+					for (Instruction i : g.getInstructions()) {
+						
+						if (i.getType().equals("Segment")) {
+							if (i.getP1().getX()-(screen.width/180/2) == oldX || i.getP2().getX()-(screen.width/180/2) == oldX && i.getP1().getY()-(screen.width/180/2) == j.getY() || i.getP2().getY()-(screen.width/180/2) == j.getY()) {
+								if (i.getP1().getX()-(screen.width/180/2) == oldX) {
+									replacementInstructions.add(new Instruction(new PlotPoint(j.getX()+(screen.width/180/2), j.getY()+(screen.width/180/2)), i.getP2(), "Segment", i.getName()));
+								} else {
+									replacementInstructions.add(new Instruction(i.getP1(), new PlotPoint(j.getX()+(screen.width/180/2), j.getY()+(screen.width/180/2)), "Segment", i.getName()));
+								}
+							} else {
+								replacementInstructions.add(i);
+							}
+						} else {
+							replacementInstructions.add(i);
+						}
+					}
+					g.setInstructions(replacementInstructions);
+				}
+				
+				frame.repaint();
+				g.repaint();
+				g.paintComponent(g.getGraphics());
+			}
+			public void keyPressed(KeyEvent e) {}
+		});
+		descBar.add(xField);
+		
+		JTextField yField = new JTextField();
+		yField.setText(trusty.str(j.getY()));
+		yField.setBounds((int) descBar.getWidth()/7, (int) Math.round(descBar.getHeight()/4.2), (int) screen.getWidth()/13, (int) screen.getHeight()/36);
+		yField.addKeyListener(new KeyListener() {
+			public void keyTyped(KeyEvent e) {}
+			public void keyReleased(KeyEvent e) {
+				int oldY = j.getY();
+				
+				try {
+					if (!yField.getText().equals("")) j.setY(trusty.Int(yField.getText()));
+					else j.setY(0);
+				} catch(NumberFormatException e1) {
+					;
+				}
+				
+				if (j.getType().equals("Point")) {
+					ArrayList<Instruction> replacementInstructions = new ArrayList<>();
+					for (Instruction i : g.getInstructions()) {
+						
+						if (i.getType().equals("Segment")) {
+							if (i.getP1().getX()-(screen.width/180/2) == j.getX() || i.getP2().getX()-(screen.width/180/2) == j.getX() && i.getP1().getY()-(screen.width/180/2) == oldY || i.getP2().getY()-(screen.width/180/2) == oldY) {
+								if (i.getP1().getX()-(screen.width/180/2) == j.getX()) {
+									replacementInstructions.add(new Instruction(new PlotPoint(j.getX()+(screen.width/180/2), j.getY()+(screen.width/180/2)), i.getP2(), "Segment", i.getName()));
+								} else {
+									replacementInstructions.add(new Instruction(i.getP1(), new PlotPoint(j.getX()+(screen.width/180/2), j.getY()+(screen.width/180/2)), "Segment", i.getName()));
+								}
+							} else {
+								replacementInstructions.add(i);
+							}
+						} else {
+							replacementInstructions.add(i);
+						}
+					}
+					g.setInstructions(replacementInstructions);
+				}
+				
+				frame.repaint();
+				g.repaint();
+				g.paintComponent(g.getGraphics());
+			}
+			public void keyPressed(KeyEvent e) {}
+		});
+		descBar.add(yField);
 	}
 }

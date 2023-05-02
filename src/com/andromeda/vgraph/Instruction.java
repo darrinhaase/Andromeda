@@ -40,12 +40,19 @@ public class Instruction implements Serializable {
 		return false;
 	}
 	
-	public double[] getLineData() {
-		double A = p1.getY() - p2.getY();
-		double B = p2.getX() - p1.getX();
-		double C = p1.getX() * p2.getY() - p2.getX() * p1.getY();
-		
-		return new double[] {A,B,C};
+	public static float slope(float x1, float y1, float x2, float y2) {
+		if (x2 - x1 != 0) return (y2 - y1)*-1 / (x2 - x1);
+		return Integer.MAX_VALUE;
+	}
+	
+	public float[] getLineData() {
+		float m = slope(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+		if (m == Integer.MAX_VALUE) {
+			return null;
+		} else {
+			float b = p1.getY() - m * p1.getX();
+			return new float[] {m, b, (p2.getY()-p1.getY()) * -1, p2.getX()-p1.getX()};
+		}
 	}
 	
 	public Instruction(int x, int y, String type, String name) {

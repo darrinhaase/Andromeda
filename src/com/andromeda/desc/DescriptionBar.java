@@ -94,7 +94,7 @@ public class DescriptionBar extends JPanel {
 		    textArea.setBackground(this.getBackground());
 		    textArea.setEditable(false);
 		    textArea.setHighlighter(null);
-		    textArea.setBounds(i.getX(), i.getY()-10, this.getWidth()-i.getX()-10, this.getHeight()-i.getY());
+		    textArea.setBounds(i.getX(), i.getY()-17, this.getWidth()-i.getX()-13, this.getHeight()-i.getY());
 		    
 		    texts.add(textArea);
 		    
