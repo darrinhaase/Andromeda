@@ -121,7 +121,7 @@ public class GraphGUI extends JPanel {
 	public ArrayList<Instruction> findObject(int x, int y) {
 		ArrayList<Instruction> possibleObjects = new ArrayList<>();
 		for (Instruction i : instructions) {
-			if (i.isColliding(x,y)) {
+			if (i.isColliding(x,y) && !i.getName().contains("midpoint")) {
 				possibleObjects.add(i);
 			}
 		}
