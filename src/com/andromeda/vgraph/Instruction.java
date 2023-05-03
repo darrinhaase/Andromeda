@@ -1,5 +1,6 @@
 package com.andromeda.vgraph;
 
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.io.Serializable;
 
@@ -11,7 +12,17 @@ public class Instruction implements Serializable {
 	private boolean filled;
 	private PlotPoint[] pList;
 	private PlotPoint p1,p2;
+	public String midpt = "";
+	private Color color = new Color(0,0,0);
 	
+	public Color getColor() {
+		return color;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
 	public boolean isColliding(int x, int y) {
 		if (this.type.equals("Point")) {
 			Rectangle bound = new Rectangle(this.x, this.y, d, d);

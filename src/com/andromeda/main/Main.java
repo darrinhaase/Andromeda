@@ -1,5 +1,6 @@
 package com.andromeda.main;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -21,6 +22,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -448,6 +450,42 @@ public class Main {
 					descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/3.3), (int) (screen.getWidth()/100), "Exact Slope: ", TextAttribute.WEIGHT_BOLD), false);
 					descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.95), (int) (screen.getWidth()/100), trusty.str(Math.round(lineData[2]))+" / "+trusty.str(Math.round(lineData[3])), TextAttribute.WEIGHT_SEMIBOLD), false);		
 				}
+				
+				descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.45), (int) (screen.getWidth()/100), "Options:", TextAttribute.WEIGHT_BOLD), false);		
+				
+				JButton midpointBtn = new JButton();
+				midpointBtn.setText("Toggle Midpoint");
+				midpointBtn.addMouseListener(new MouseListener() {
+					public void mouseReleased(MouseEvent e) {}
+					public void mousePressed(MouseEvent e) {
+						ArrayList<Instruction> replacementList = currentGraph.getInstructions();
+						if (j.midpt.equals("")) {
+								Instruction m = new Instruction((j.getP2().getX()+j.getP1().getX())/2-(Main.screen.width/180/2), (j.getP1().getY()+j.getP2().getY())/2-(Main.screen.width/180/2), "Point", "midpoint"+j.getName());
+									m.setDiameter(screen.width/150);
+									m.setFilled(true);
+									m.setColor(new Color(255,0,0));
+								replacementList.add(m);
+							currentGraph.setInstructions(replacementList);
+							j.midpt = "midpoint"+j.getName();
+						} else {
+							for (int o = 0; o < replacementList.size(); o++) {
+								if (replacementList.get(o).getName().equals("midpoint"+j.getName())) {
+									replacementList.remove(o);
+								}
+							}
+							currentGraph.setInstructions(replacementList);
+							j.midpt = "";
+						}
+						currentGraph.repaint();
+						currentGraph.paintComponent(currentGraph.getGraphics());
+					}
+					public void mouseExited(MouseEvent e) {}
+					public void mouseEntered(MouseEvent e) {}
+					public void mouseClicked(MouseEvent e) {}
+				});
+				midpointBtn.setBounds((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.35), screen.width/12, screen.height/30);
+				descBar.add(midpointBtn);
+				
 				break;
 		
 			}

@@ -46,13 +46,12 @@ public class GraphGUI extends JPanel {
 		instructions.add(tempInstruction);
 	
 		if (plotnum % 2 == 0) {
-			drawCircle(trusty.str(plotnum-1), trusty.str(plotnum));
+			drawLine(trusty.str(plotnum-1), trusty.str(plotnum));
 		}
 		plotnum++;
 		naming++;
 	}
 	
-	//Use this outside of class for ease of use
 	public void drawCircle(String midPoint, String outerPoint) {
 		PlotPoint mid = null;
 		PlotPoint out = null;
@@ -153,6 +152,7 @@ public class GraphGUI extends JPanel {
 				break;
 			
 			case "Point":
+				g2.setColor(i.getColor());
 			    g2.setStroke(new BasicStroke(3));
 			    if (i.getFilled())
 					g2.fillOval(i.getX(), i.getY(), i.getDiameter(), i.getDiameter());
