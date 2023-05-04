@@ -22,7 +22,7 @@ public class GraphGUI extends JPanel {
 	/*
 	 * DELETE FOR PRODUCTION
 	 */
-	private int plotnum = 1;
+	public int plotnum = 1;
 	
 	public ArrayList<Instruction> getInstructions() {
 		return instructions;
@@ -44,10 +44,37 @@ public class GraphGUI extends JPanel {
 		tempInstruction.setDiameter(Main.screen.width/180);
 	
 		instructions.add(tempInstruction);
-	
-		if (plotnum % 2 == 0) {
-			drawLine(trusty.str(plotnum-1), trusty.str(plotnum));
+
+		switch (Main.selectedTool) {
+
+			case "point":
+				System.out.println("just a point lol");
+				break;
+
+			case "line":
+				if (plotnum % 2 == 0) {
+					drawLine(trusty.str(plotnum-1), trusty.str(plotnum));
+				}
+				break;
+
+			case "circle":
+				if (plotnum % 2 == 0) {
+					drawCircle(trusty.str(plotnum-1), trusty.str(plotnum));
+				}
+				break;
+
+			case "rectangle":
+				if (plotnum % 4 == 0) {
+					drawRectangle(trusty.str(plotnum-3), trusty.str(plotnum-2), trusty.str(plotnum-1), trusty.str(plotnum));
+				}
+				break;
+
+			default:
+				System.out.println("Unknown tool");
+				break;
+
 		}
+
 		plotnum++;
 		naming++;
 	}

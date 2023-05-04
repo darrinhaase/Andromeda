@@ -300,7 +300,7 @@ public class trusty implements ActionListener {
 	 * !!!!!!!
 	 */
 	
-	public class physics {
+	public static class physics {
 		
 		@SuppressWarnings("unused")
 		private static double WIDTH, HEIGHT, FRICTION, SPEED;
@@ -515,7 +515,7 @@ public class trusty implements ActionListener {
 	
 	
 	//Testing Class
-	public class TestAssist {
+	public static class TestAssist {
 		
 		public static<T> boolean assertEquals(T expected, T actual) {
 			if (expected != actual) { 
@@ -558,7 +558,7 @@ public class trusty implements ActionListener {
 	
 	
 	//Requests Class
-	public class Requests {
+	public static class Requests {
 		
 		public static String get(String url) {
 			try {
@@ -602,9 +602,9 @@ public class trusty implements ActionListener {
 	
 	//Socket Server Nested Classes and Methods
 	
-	public class socket {
+	public static class socket {
 		
-		public class server {
+		public static class server {
 			
 			private static ServerSocket socketConnection = null;
 			private static Socket acceptClient = null;
@@ -648,7 +648,7 @@ public class trusty implements ActionListener {
 			
 		}
 		
-		public class client {
+		public static class client {
 			
 			public static Socket connectToServer;
 			
@@ -685,7 +685,7 @@ public class trusty implements ActionListener {
 		}
  	}
 	
-	public class EncodeDecoder {
+	public static class EncodeDecoder {
 		public static String encode(String text) {
 			return Base64.getEncoder().encodeToString(text.getBytes());
 		}

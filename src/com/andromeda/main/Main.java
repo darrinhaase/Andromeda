@@ -49,6 +49,47 @@ public class Main {
 	private static JTabbedPane tabbedPane;
 	private static DescriptionBar descBar = new DescriptionBar(screen);
 	public static JFrame frame = null;
+
+	public static String selectedTool = "point";
+	public static String[] availableTools = {"point", "circle", "line", "rectangle"};
+
+	public static void rebuildToolsMenu(JMenu toolsBar) {
+
+		/*
+		*
+		*	responsible for building, rebuilding, and event handling for "Tools" menu bar
+		* 	directly controls selectedTool and availableTools above
+		*
+		 */
+
+		// clean out existing JMenuItems
+		toolsBar.removeAll();
+
+		// dynamically define tools based on above array (availableTools)
+		for (int i = 0; i < availableTools.length; i++) {
+			//original string name in array for tool, used in plot();
+			String _tempToolName = availableTools[i];
+
+			// build the display text shown in menu
+			String _tempToolDisplayName = _tempToolName.substring(0, 1).toUpperCase() + _tempToolName.substring(1) + " Tool";
+			if (_tempToolName == selectedTool) {
+				_tempToolDisplayName += " (selected)";
+			}
+
+			// add item to JMenu
+			JMenuItem _tempToolMenuBarItem = toolsBar.add(new JMenuItem(_tempToolDisplayName));
+			_tempToolMenuBarItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					// when clicked, set the global selectedTool to the selected menu item
+					selectedTool = _tempToolName;
+					// run this function again on click to update (selected) indicator
+					rebuildToolsMenu(toolsBar);
+					// reset plotnum count in current GraphUI
+					currentGraph.plotnum = 1;
+				}
+			});
+		}
+	}
 	
 	public static void main(String[] args) throws Exception {
 
@@ -218,6 +259,9 @@ public class Main {
 				JMenu editBar = new JMenu("Edit");
 					editBar.add(new JMenuItem("Erase"));
 					menuBar.add(editBar);
+				JMenu toolsBar = new JMenu("Tools");
+					rebuildToolsMenu(toolsBar);
+					menuBar.add(toolsBar);
 			frame.setJMenuBar(menuBar);
 			
 			tabbedPane = new JTabbedPane();
