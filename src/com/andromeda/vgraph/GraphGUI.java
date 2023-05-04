@@ -193,6 +193,14 @@ public class GraphGUI extends JPanel {
 			    else
 					g2.drawOval(i.getX(), i.getY(), i.getDiameter(), i.getDiameter());
 			    break;
+			case "Rectangle":
+				g2.setStroke(new BasicStroke(3));
+				PlotPoint[] pointsInRectangle = i.getpList();
+				g2.drawLine(pointsInRectangle[0].getX(), pointsInRectangle[0].getY(), pointsInRectangle[1].getX(), pointsInRectangle[1].getY());
+				g2.drawLine(pointsInRectangle[1].getX(), pointsInRectangle[1].getY(), pointsInRectangle[2].getX(), pointsInRectangle[2].getY());
+				g2.drawLine(pointsInRectangle[2].getX(), pointsInRectangle[2].getY(), pointsInRectangle[3].getX(), pointsInRectangle[3].getY());
+				g2.drawLine(pointsInRectangle[3].getX(), pointsInRectangle[3].getY(), pointsInRectangle[0].getX(), pointsInRectangle[0].getY());
+				break;
 			}
 		}
 		g.dispose();

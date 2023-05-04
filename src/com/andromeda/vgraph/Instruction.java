@@ -11,6 +11,13 @@ public class Instruction implements Serializable {
 	private String type,name;
 	private boolean filled;
 	private PlotPoint[] pList;
+	public PlotPoint[] getpList() {
+		return pList;
+	}
+
+	public void setpList(PlotPoint[] pList) {
+		this.pList = pList;
+	}
 	private PlotPoint p1,p2;
 	public String midpt = "";
 	private Color color = new Color(0,0,0);
