@@ -1,4 +1,7 @@
 /bin/
+/src/.idea/
+/src/out/
+/src/Main.iml
 /.settings/
 /.classpath
 /.project

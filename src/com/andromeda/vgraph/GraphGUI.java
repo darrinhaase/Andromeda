@@ -63,7 +63,7 @@ public class GraphGUI extends JPanel {
 				}
 				break;
 
-			case "rectangle":
+			case "quadrilateral":
 				if (plotnum % 4 == 0) {
 					drawRectangle(trusty.str(plotnum-3), trusty.str(plotnum-2), trusty.str(plotnum-1), trusty.str(plotnum));
 				}

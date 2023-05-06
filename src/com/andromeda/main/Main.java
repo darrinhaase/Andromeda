@@ -2,6 +2,7 @@ package com.andromeda.main;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -51,7 +52,7 @@ public class Main {
 	public static JFrame frame = null;
 
 	public static String selectedTool = "point";
-	public static String[] availableTools = {"point", "circle", "line", "rectangle"};
+	public static String[] availableTools = {"point", "circle", "line", "quadrilateral"};
 
 	public static void rebuildToolsMenu(JMenu toolsBar) {
 
@@ -256,9 +257,6 @@ public class Main {
 						});
 						
 					menuBar.add(fileBar);
-				JMenu editBar = new JMenu("Edit");
-					editBar.add(new JMenuItem("Erase"));
-					menuBar.add(editBar);
 				JMenu toolsBar = new JMenu("Tools");
 					rebuildToolsMenu(toolsBar);
 					menuBar.add(toolsBar);
@@ -534,7 +532,31 @@ public class Main {
 		
 			}
 			
+			JButton deleteButton = new JButton();
+				deleteButton.setText("Delete Element");
+				deleteButton.setForeground(new Color(248,81,73));
+				deleteButton.addMouseListener(new MouseListener() {
+					public void mouseReleased(MouseEvent e) {}
+					public void mousePressed(MouseEvent e) {
+						descBar.removeElement(j, currentGraph);
+					}
+					public void mouseExited(MouseEvent e) {
+						frame.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+						deleteButton.setForeground(new Color(248,81,73));
+						deleteButton.setBackground(new Color(255,255,255));
+					}
+					public void mouseEntered(MouseEvent e) {
+						frame.setCursor(new Cursor(Cursor.HAND_CURSOR));
+						deleteButton.setBackground(new Color(248,81,73));
+						deleteButton.setForeground(new Color(255,255,255));
+					}
+					public void mouseClicked(MouseEvent e) {}
+				});
+				deleteButton.setBounds((int) Math.round(descBar.getWidth()/18.5), (int) Math.round(descBar.getHeight()/1.35), screen.width/8, screen.height/30);
+				descBar.add(deleteButton);
+			
 			toggleDescriptionBar(true);
+			break;
 		}
 	}
 	

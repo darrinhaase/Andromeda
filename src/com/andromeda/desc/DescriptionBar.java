@@ -15,9 +15,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import com.andromeda.main.Main;
+import com.andromeda.vgraph.GraphGUI;
+import com.andromeda.vgraph.Instruction;
 
 @SuppressWarnings("serial")
 public class DescriptionBar extends JPanel {
@@ -26,6 +29,17 @@ public class DescriptionBar extends JPanel {
 	private ArrayList<JTextArea> texts = new ArrayList<>();
 	private Rectangle close = null;
 	private boolean clear;
+	
+	public void removeElement(Instruction i, GraphGUI g) {
+		if(JOptionPane.showConfirmDialog(Main.frame, "Are you sure you want to remove this item?") == 0) {
+			ArrayList<Instruction> replacementList = g.getInstructions();
+				replacementList.remove(i);
+			g.setInstructions(replacementList);
+			g.repaint();
+			g.paintComponents(g.getGraphics());
+			Main.toggleDescriptionBar(false);
+		}
+	}
 
 	public DescriptionBar(Dimension screen) {
 		this.setBounds(0, 0, (int) Math.round(screen.getWidth()-Math.round(screen.getWidth()/1.25f)), (int) screen.getHeight());
