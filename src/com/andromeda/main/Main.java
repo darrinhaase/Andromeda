@@ -46,45 +46,51 @@ public class Main {
 	
 	public static final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 	private static GraphGUI graph;
-	private static GraphGUI currentGraph;
+	public static GraphGUI currentGraph;
 	private static JTabbedPane tabbedPane;
 	private static DescriptionBar descBar = new DescriptionBar(screen);
 	public static JFrame frame = null;
 
 	public static String selectedTool = "point";
-	public static String[] availableTools = {"point", "circle", "line", "quadrilateral"};
+	public static String[] availableTools = {"point", "circle", "segment", "quadrilateral", "textbox"};
+	
+    public static String selectedUnit = "cm";
+    public static String[] availableUnits = {"cm", "in"};
 
-	public static void rebuildToolsMenu(JMenu toolsBar) {
+	public static void rebuildMenu(JMenu thisMenu, String[] itemsList, String selected, String typeView) {
 
-		/*
-		*
-		*	responsible for building, rebuilding, and event handling for "Tools" menu bar
-		* 	directly controls selectedTool and availableTools above
-		*
-		 */
+		/*	responsible for building, rebuilding, and event handling for "Tools" menu bar
+		* 	directly controls selectedTool and availableTools above */
 
 		// clean out existing JMenuItems
-		toolsBar.removeAll();
+		thisMenu.removeAll();
 
 		// dynamically define tools based on above array (availableTools)
-		for (int i = 0; i < availableTools.length; i++) {
+		for (int i = 0; i < itemsList.length; i++) {
 			//original string name in array for tool, used in plot();
-			String _tempToolName = availableTools[i];
+			String _tempToolName = itemsList[i];
 
 			// build the display text shown in menu
 			String _tempToolDisplayName = _tempToolName.substring(0, 1).toUpperCase() + _tempToolName.substring(1) + " Tool";
-			if (_tempToolName == selectedTool) {
+			if (_tempToolName == selected) {
 				_tempToolDisplayName += " (selected)";
 			}
 
 			// add item to JMenu
-			JMenuItem _tempToolMenuBarItem = toolsBar.add(new JMenuItem(_tempToolDisplayName));
+			JMenuItem _tempToolMenuBarItem = thisMenu.add(new JMenuItem(_tempToolDisplayName));
 			_tempToolMenuBarItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					
+					if (currentGraph != null) {
+                         if (typeView.equals("tools") && currentGraph.currentlyDrawing) {
+                                JOptionPane.showMessageDialog(frame, "You're currently drawing a shape. Please finish drawing to switch tools.");
+                                return;
+                        }
+                     }
 					// when clicked, set the global selectedTool to the selected menu item
 					selectedTool = _tempToolName;
 					// run this function again on click to update (selected) indicator
-					rebuildToolsMenu(toolsBar);
+					rebuildMenu(thisMenu, itemsList, selectedTool, typeView);
 					// reset plotnum count in current GraphUI
 					currentGraph.plotnum = 1;
 				}
@@ -94,7 +100,7 @@ public class Main {
 	
 	public static void main(String[] args) throws Exception {
 
-			frame = trusty.frame("Jesuit Geometry - Andromeda", screen.width/2, screen.height, null, false);
+			frame = trusty.frame("Jesuit Geometry - Andromeda", screen.width/2, screen.height, "assets/logo.png", false);
 			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			frame.setVisible(true);
 			frame.addKeyListener(new KeyListener() {
@@ -257,9 +263,16 @@ public class Main {
 						});
 						
 					menuBar.add(fileBar);
+					
 				JMenu toolsBar = new JMenu("Tools");
-					rebuildToolsMenu(toolsBar);
-					menuBar.add(toolsBar);
+                    rebuildMenu(toolsBar, availableTools, selectedTool, "tools");
+                    menuBar.add(toolsBar);
+                  
+             
+                JMenu viewBar = new JMenu("View");
+                    rebuildMenu(viewBar, availableUnits, selectedUnit, "units");
+                    menuBar.add(viewBar);
+                        
 			frame.setJMenuBar(menuBar);
 			
 			tabbedPane = new JTabbedPane();
@@ -443,6 +456,7 @@ public class Main {
 			tabbedPane.setBounds(screen.width/49, screen.height/45, Math.round(frame.getWidth()/1.05f), frame.getHeight()-frame.getHeight()/8);
 			tabbedPane.repaint();
 			
+			frame.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			frame.getContentPane().remove(descBar);
 			frame.repaint();
 		}
@@ -469,6 +483,9 @@ public class Main {
 				case "Segment":
 					definitionText = "One dimensional structure between two points";
 					break;
+                case "Text":
+                    definitionText = "a fucking textbox you dumbass";
+                    break;
 			
 			}
 			
@@ -528,7 +545,91 @@ public class Main {
 				midpointBtn.setBounds((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.35), screen.width/12, screen.height/30);
 				descBar.add(midpointBtn);
 				
+				descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/1, (int) (screen.getWidth()/100), "Segment Length: " + "500" + selectedUnit, TextAttribute.WEIGHT_BOLD), false);
+				
 				break;
+				
+				
+            case "Text":
+                descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/5, (int) (screen.getWidth()/100), "X: ", TextAttribute.WEIGHT_SEMIBOLD), false);
+                descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/4, (int) (screen.getWidth()/100), "Y: ", TextAttribute.WEIGHT_SEMIBOLD), false);
+                
+                Instruction textPoint = null;
+                
+                for (Instruction l : currentGraph.getInstructions()) {
+                	if (l.getSuperObject().equals(j.getName())) {
+                		textPoint = l;
+                	}
+                }
+                
+                JTextField xField = new JTextField();
+                xField.setText(trusty.str(textPoint.getX()));
+                
+                xField.setBounds((int) descBar.getWidth()/7, (int) Math.round(descBar.getHeight()/5.31), (int) screen.getWidth()/13, (int) screen.getHeight()/36);
+                xField.addKeyListener(new KeyListener() {
+                    public void keyTyped(KeyEvent e) {}
+                    public void keyReleased(KeyEvent e) {
+                    	
+                    	for (Instruction l : currentGraph.getInstructions()) {
+                        	if (l.getSuperObject().equals(j.getName())) {
+                        		try {
+                                    if (!xField.getText().equals("")) {
+                                    	l.setX(trusty.Int(xField.getText()));
+                                    	j.setX(trusty.Int(xField.getText()));
+                                    }
+                                    else {
+                                    	l.setX(0);
+                                    	j.setX(0);
+                                    }
+                                } catch(NumberFormatException e1) {
+                                    ;
+                                }
+                                
+                                frame.repaint();
+                                g.repaint();
+                                g.paintComponent(g.getGraphics());
+                        	}
+                        }
+                        
+                        
+                    }
+                    public void keyPressed(KeyEvent e) {}
+                });
+                descBar.add(xField);
+                
+                JTextField yField = new JTextField();
+                yField.setText(trusty.str(j.getY()));
+                yField.setBounds((int) descBar.getWidth()/7, (int) Math.round(descBar.getHeight()/4.2), (int) screen.getWidth()/13, (int) screen.getHeight()/36);
+                yField.addKeyListener(new KeyListener() {
+                    public void keyTyped(KeyEvent e) {}
+                    public void keyReleased(KeyEvent e) {
+                        for (Instruction l : currentGraph.getInstructions()) {
+                        	 if (l.getSuperObject().equals(j.getName())) {
+                        		 try {
+                                     if (!yField.getText().equals("")) {
+                                    	 l.setY(trusty.Int(yField.getText()));
+                                    	 j.setY(trusty.Int(yField.getText()));
+                                     }
+                                     else {
+                                    	 l.setY(0);
+                                    	 j.setY(0);
+                                     }
+                                 } catch(NumberFormatException e1) {
+                                     ;
+                                 }
+                           
+                                 frame.repaint();
+                                 g.repaint();
+                                 g.paintComponent(g.getGraphics());
+                        	 }
+                        }
+                    }
+                    public void keyPressed(KeyEvent e) {}
+                });
+                descBar.add(yField);
+                addTextEntry(j, g);
+                
+                break;
 		
 			}
 			
@@ -552,13 +653,35 @@ public class Main {
 					}
 					public void mouseClicked(MouseEvent e) {}
 				});
-				deleteButton.setBounds((int) Math.round(descBar.getWidth()/18.5), (int) Math.round(descBar.getHeight()/1.35), screen.width/8, screen.height/30);
-				descBar.add(deleteButton);
+				deleteButton.setBounds((int) Math.round(descBar.getWidth()/13), (int) Math.round(descBar.getHeight()/1.18), screen.width/6, screen.height/30);
+					
+				if (j.getSuperObject().equals("")) descBar.add(deleteButton);
 			
 			toggleDescriptionBar(true);
 			break;
 		}
 	}
+	
+	private static void addTextEntry(Instruction j, GraphGUI g) {
+		        descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/3, (int) (screen.getWidth()/100), "Text: ", TextAttribute.WEIGHT_SEMIBOLD), false);        
+        
+        JTextField textBoxData = new JTextField();
+        textBoxData.setText(j.getText());
+        textBoxData.setBounds((int) descBar.getWidth()/5, (int) Math.round(descBar.getHeight()/3.17), (int) screen.getWidth()/13, (int) screen.getHeight()/36);
+        
+        textBoxData.addKeyListener(new KeyListener() {
+            public void keyTyped(KeyEvent e) {}
+            public void keyReleased(KeyEvent e) {
+                j.setText(textBoxData.getText());
+                frame.repaint();
+                g.repaint();
+                g.paintComponent(g.getGraphics());
+            }
+            public void keyPressed(KeyEvent e) {}
+            });
+        
+        descBar.add(textBoxData);
+    }
 	
 	private static void addXandY(Instruction j, GraphGUI g) {
 		descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/5, (int) (screen.getWidth()/100), "X: ", TextAttribute.WEIGHT_SEMIBOLD), false);
@@ -566,6 +689,7 @@ public class Main {
 		
 		JTextField xField = new JTextField();
 		xField.setText(trusty.str(j.getX()));
+		
 		xField.setBounds((int) descBar.getWidth()/7, (int) Math.round(descBar.getHeight()/5.31), (int) screen.getWidth()/13, (int) screen.getHeight()/36);
 		xField.addKeyListener(new KeyListener() {
 			public void keyTyped(KeyEvent e) {}

@@ -8,9 +8,20 @@ public class Instruction implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private int x, y, d;
-	private String type,name;
+	private String type,name,text;
 	private boolean filled;
 	private PlotPoint[] pList;
+	private String superObject = "";
+	public boolean active = false;
+	
+	public String getSuperObject() {
+		return superObject;
+	}
+
+	public void setSuperObject(String superObject) {
+		this.superObject = superObject;
+	}
+
 	public PlotPoint[] getpList() {
 		return pList;
 	}
@@ -31,7 +42,7 @@ public class Instruction implements Serializable {
 	}
 
 	public boolean isColliding(int x, int y) {
-		if (this.type.equals("Point")) {
+		if (this.type.equals("Point") || this.type.equals("Text")) {
 			Rectangle bound = new Rectangle(this.x, this.y, d, d);
 			if (bound.contains(x,y)) return true;
 			else return false;
@@ -54,6 +65,9 @@ public class Instruction implements Serializable {
 				    return false;
 				}
 			}
+		} else if (this.type.equals("Circle")) {
+			double distance = GraphGUI.calculateDistance(x, y, this.x+d/2, this.y+d/2);
+			return Math.abs(distance - d/2) <= 5;
 		}
 		return false;
 	}
@@ -80,6 +94,14 @@ public class Instruction implements Serializable {
 		this.name = name;
 	}
 	
+	public Instruction(int x, int y, String text, String type, String name) {
+    		this.x = x;
+    		this.y = y;
+    		this.type = type;
+    		this.name = name;
+    		this.text = text;
+    	}
+	
 	public Instruction(PlotPoint p1, PlotPoint p2, String type, String name) {
 		this.p1 = p1;
 		this.p2 = p2;
@@ -102,6 +124,15 @@ public class Instruction implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public String getText() {
+	    return this.text;
+	}
+	
+	public void setText(String text) {
+     	 this.text = text;
+     }
+	
 	
 	public PlotPoint getP1() {
 		return p1;

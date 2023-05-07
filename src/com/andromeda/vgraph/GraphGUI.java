@@ -18,6 +18,7 @@ public class GraphGUI extends JPanel {
 	public File saveFile = null;
 	private ArrayList<Instruction> instructions = new ArrayList<>();
 	private int naming = 1;
+	public boolean currentlyDrawing = false;
 	
 	/*
 	 * DELETE FOR PRODUCTION
@@ -39,33 +40,58 @@ public class GraphGUI extends JPanel {
 	}
 	
 	public void plot(int x, int y) {
+		
 		Instruction tempInstruction = new Instruction(x-(Main.screen.width/180/2), y-(Main.screen.width/180/2), "Point", String.valueOf(plotnum));
-		tempInstruction.setFilled(true);
-		tempInstruction.setDiameter(Main.screen.width/180);
-	
+		 tempInstruction.setFilled(true);
+	     tempInstruction.setDiameter(Main.screen.width/180);
+		
+		if (Main.selectedTool.equals("point") || Main.selectedTool.equals("segment")) {
+			tempInstruction.active = true;
+		}
+		tempInstruction.setSuperObject(trusty.str(naming));
 		instructions.add(tempInstruction);
 
 		switch (Main.selectedTool) {
+			
+			case "textbox":
+				tempInstruction.setSuperObject(trusty.str(naming));
+			    drawTextBox(x, y);
+			    break;
+			    
 
 			case "point":
-				System.out.println("just a point lol");
 				break;
 
-			case "line":
+			case "segment":
 				if (plotnum % 2 == 0) {
+					tempInstruction.setSuperObject(trusty.str(naming));
 					drawLine(trusty.str(plotnum-1), trusty.str(plotnum));
+					currentlyDrawing = false;
+				} else {
+					tempInstruction.setSuperObject(trusty.str(naming));
+					currentlyDrawing = true;
 				}
 				break;
 
 			case "circle":
 				if (plotnum % 2 == 0) {
+					tempInstruction.setSuperObject(trusty.str(naming));
 					drawCircle(trusty.str(plotnum-1), trusty.str(plotnum));
+					currentlyDrawing = false;
+				} else {
+					tempInstruction.setSuperObject(trusty.str(naming));
+					currentlyDrawing = true;
 				}
 				break;
 
 			case "quadrilateral":
 				if (plotnum % 4 == 0) {
+					tempInstruction.setSuperObject(trusty.str(naming));
 					drawRectangle(trusty.str(plotnum-3), trusty.str(plotnum-2), trusty.str(plotnum-1), trusty.str(plotnum));
+					currentlyDrawing = false;
+				} else {
+					tempInstruction.setSuperObject(trusty.str(naming));
+					currentlyDrawing = true;
 				}
 				break;
 
@@ -74,9 +100,7 @@ public class GraphGUI extends JPanel {
 				break;
 
 		}
-
 		plotnum++;
-		naming++;
 	}
 	
 	public void drawCircle(String midPoint, String outerPoint) {
@@ -96,6 +120,17 @@ public class GraphGUI extends JPanel {
 		
 		instructions.add(tempInstruction);
 	}
+	
+	public void drawTextBox(int x, int y) {
+        			
+    	    Instruction tempInstruction = new Instruction(x-(Main.screen.width/180/2), y-(Main.screen.width/180/2), "Example Text", "Text", String.valueOf(naming));
+			 	tempInstruction.setFilled(true);
+		        tempInstruction.setDiameter(Main.screen.width/180);
+		        
+		        instructions.add(tempInstruction);
+
+    		naming++;
+    }
 	
 	public void drawRectangle(String p1, String p2, String p3, String p4) {
 		PlotPoint point1 = null;
@@ -149,13 +184,19 @@ public class GraphGUI extends JPanel {
 		ArrayList<Instruction> possibleObjects = new ArrayList<>();
 		for (Instruction i : instructions) {
 			if (i.isColliding(x,y) && !i.getName().contains("midpoint")) {
-				possibleObjects.add(i);
+				if (i.getType().equals("Point")) {
+					if (i.active) {
+						possibleObjects.add(i);
+					}
+				} else {
+					possibleObjects.add(i);
+				}
 			}
 		}
 		return possibleObjects;
 	}
 	
-	public double calculateDistance(int x1, int y1, int x2, int y2) {
+	public static double calculateDistance(int x1, int y1, int x2, int y2) {
 	    int deltaX = x2 - x1;
 	    int deltaY = y2 - y1;
 	    return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -172,7 +213,12 @@ public class GraphGUI extends JPanel {
 		Graphics2D g2 = (Graphics2D) g.create();
 		for (Instruction i : instructions) {
 			switch(i.getType()) {
-			
+				
+			case "Text":
+				g2.setStroke(new BasicStroke(3));
+				g2.drawString(i.getText(), i.getX() + Main.screen.width/100, i.getY() + Main.screen.height/100);
+				break;
+				
 			case "Segment":
 			    g2.setStroke(new BasicStroke(3));
 				g2.drawLine(i.getP1().getX(), i.getP1().getY(), i.getP2().getX(), i.getP2().getY());

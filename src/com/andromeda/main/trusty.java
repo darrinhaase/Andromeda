@@ -58,13 +58,7 @@ public class trusty implements ActionListener {
 		
 		else {
 			
-			try {
-				
-				frame.setIconImage(ImageIO.read(trusty.class.getResource(imagepath)));
-				
-			} catch (IOException e) {
-				
-			}
+			frame.setIconImage(new ImageIcon(imagepath).getImage());
 			
 		}
 		

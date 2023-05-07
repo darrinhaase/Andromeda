@@ -14,6 +14,7 @@ import java.awt.font.TextAttribute;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -33,7 +34,13 @@ public class DescriptionBar extends JPanel {
 	public void removeElement(Instruction i, GraphGUI g) {
 		if(JOptionPane.showConfirmDialog(Main.frame, "Are you sure you want to remove this item?") == 0) {
 			ArrayList<Instruction> replacementList = g.getInstructions();
-				replacementList.remove(i);
+			for (Iterator<Instruction> iterator = replacementList.iterator(); iterator.hasNext(); ) {
+			    Instruction l = iterator.next();
+			    if (l.getSuperObject().equals(i.getName())) {
+			    	iterator.remove();
+			    }
+			}
+			replacementList.remove(i);
 			g.setInstructions(replacementList);
 			g.repaint();
 			g.paintComponents(g.getGraphics());
