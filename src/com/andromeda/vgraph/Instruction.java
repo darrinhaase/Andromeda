@@ -1,6 +1,7 @@
 package com.andromeda.vgraph;
 
 import java.awt.Color;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.io.Serializable;
 
@@ -13,7 +14,25 @@ public class Instruction implements Serializable {
 	private PlotPoint[] pList;
 	private String superObject = "";
 	public boolean active = false;
+	private boolean square = false;
+	private Polygon quad = new Polygon();
 	
+	public Polygon getQuad() {
+		return quad;
+	}
+
+	public void setQuad(Polygon quad) {
+		this.quad = quad;
+	}
+
+	public boolean isSquare() {
+		return square;
+	}
+
+	public void setSquare(boolean square) {
+		this.square = square;
+	}
+
 	public String getSuperObject() {
 		return superObject;
 	}
@@ -68,9 +87,30 @@ public class Instruction implements Serializable {
 		} else if (this.type.equals("Circle")) {
 			double distance = GraphGUI.calculateDistance(x, y, this.x+d/2, this.y+d/2);
 			return Math.abs(distance - d/2) <= 5;
+		} else if (this.type.equals("Quadrilateral")) {
+			 for (int i = 0; i < this.quad.npoints; i++) {
+                 int j = (i + 1) % this.quad.npoints;
+
+                 int x1 = this.quad.xpoints[i];
+                 int y1 = this.quad.ypoints[i];
+                 int x2 = this.quad.xpoints[j];
+                 int y2 = this.quad.ypoints[j];
+
+                 double distance = pointToLineDistance(x, y, x1, y1, x2, y2);
+
+                 double threshold = 5.0;
+
+                 if (distance <= threshold) return true;
+             }
 		}
 		return false;
 	}
+	
+	private double pointToLineDistance(int x, int y, int x1, int y1, int x2, int y2) {
+        double numerator = Math.abs((x2 - x1) * (y1 - y) - (x1 - x) * (y2 - y1));
+        double denominator = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
+        return numerator / denominator;
+    }
 	
 	public static float slope(float x1, float y1, float x2, float y2) {
 		if (x2 - x1 != 0) return (y2 - y1)*-1 / (x2 - x1);

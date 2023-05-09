@@ -2,10 +2,18 @@ package com.andromeda.vgraph;
 
 import java.awt.BasicStroke;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.Polygon;
+import java.awt.font.TextAttribute;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.swing.JPanel;
 import com.andromeda.main.Main;
 import com.andromeda.main.trusty;
@@ -48,13 +56,13 @@ public class GraphGUI extends JPanel {
 		if (Main.selectedTool.equals("point") || Main.selectedTool.equals("segment")) {
 			tempInstruction.active = true;
 		}
-		tempInstruction.setSuperObject(trusty.str(naming));
 		instructions.add(tempInstruction);
 
 		switch (Main.selectedTool) {
 			
 			case "textbox":
 				tempInstruction.setSuperObject(trusty.str(naming));
+				tempInstruction.setSquare(true);
 			    drawTextBox(x, y);
 			    break;
 			    
@@ -79,18 +87,18 @@ public class GraphGUI extends JPanel {
 					drawCircle(trusty.str(plotnum-1), trusty.str(plotnum));
 					currentlyDrawing = false;
 				} else {
-					tempInstruction.setSuperObject(trusty.str(naming));
+					tempInstruction.setSuperObject("mid"+trusty.str(naming));
 					currentlyDrawing = true;
 				}
 				break;
 
 			case "quadrilateral":
 				if (plotnum % 4 == 0) {
-					tempInstruction.setSuperObject(trusty.str(naming));
-					drawRectangle(trusty.str(plotnum-3), trusty.str(plotnum-2), trusty.str(plotnum-1), trusty.str(plotnum));
+					tempInstruction.setSuperObject("quad"+trusty.str(naming));
+					drawQuadrilateral(trusty.str(plotnum-3), trusty.str(plotnum-2), trusty.str(plotnum-1), trusty.str(plotnum));
 					currentlyDrawing = false;
 				} else {
-					tempInstruction.setSuperObject(trusty.str(naming));
+					tempInstruction.setSuperObject("quad"+trusty.str(naming));
 					currentlyDrawing = true;
 				}
 				break;
@@ -132,7 +140,7 @@ public class GraphGUI extends JPanel {
     		naming++;
     }
 	
-	public void drawRectangle(String p1, String p2, String p3, String p4) {
+	public void drawQuadrilateral(String p1, String p2, String p3, String p4) {
 		PlotPoint point1 = null;
 		PlotPoint point2 = null;
 		PlotPoint point3 = null;
@@ -145,8 +153,12 @@ public class GraphGUI extends JPanel {
 			else if (i.getName().equals(p4)) point4 = new PlotPoint(i.getX()+(i.getDiameter()/2), i.getY()+(i.getDiameter()/2));
 		}
 		
-		Instruction tempInstruction = new Instruction("Rectangle", String.valueOf(naming), point1, point2, point3, point4);
+		Instruction tempInstruction = new Instruction("Quadrilateral", String.valueOf(naming), point1, point2, point3, point4);
+			tempInstruction.setQuad(new Polygon(new int[] {point1.getX(), point2.getX(), point3.getX(), point4.getX()}, new int[] {point1.getY(), point2.getY(), point3.getY(), point4.getY()}, 4));
 		instructions.add(tempInstruction);
+		
+		
+		
 		naming++;
 	}
 	
@@ -184,13 +196,11 @@ public class GraphGUI extends JPanel {
 		ArrayList<Instruction> possibleObjects = new ArrayList<>();
 		for (Instruction i : instructions) {
 			if (i.isColliding(x,y) && !i.getName().contains("midpoint")) {
-				if (i.getType().equals("Point")) {
-					if (i.active) {
+					if (i.getType().equals("Point")) {
+						if (i.active) possibleObjects.add(i);
+					} else {
 						possibleObjects.add(i);
 					}
-				} else {
-					possibleObjects.add(i);
-				}
 			}
 		}
 		return possibleObjects;
@@ -215,7 +225,14 @@ public class GraphGUI extends JPanel {
 			switch(i.getType()) {
 				
 			case "Text":
-				g2.setStroke(new BasicStroke(3));
+				Font customFont = new Font("Sans", Font.PLAIN, Main.screen.width/115);
+					customFont = customFont.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD));
+					Map<TextAttribute, Object> attributes = new HashMap<TextAttribute, Object>();
+					attributes.put(TextAttribute.TRACKING, 0.03);
+					customFont = customFont.deriveFont(attributes);
+				    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+				    ge.registerFont(customFont);
+				g2.setFont(customFont);
 				g2.drawString(i.getText(), i.getX() + Main.screen.width/100, i.getY() + Main.screen.height/100);
 				break;
 				
@@ -227,10 +244,17 @@ public class GraphGUI extends JPanel {
 			case "Point":
 				g2.setColor(i.getColor());
 			    g2.setStroke(new BasicStroke(3));
-			    if (i.getFilled())
-					g2.fillOval(i.getX(), i.getY(), i.getDiameter(), i.getDiameter());
-			    else
-					g2.drawOval(i.getX(), i.getY(), i.getDiameter(), i.getDiameter());
+			    if (i.isSquare()) {
+			    	 if (i.getFilled())
+							g2.fillRect(i.getX(), i.getY(), i.getDiameter(), i.getDiameter());
+					    else
+							g2.drawRect(i.getX(), i.getY(), i.getDiameter(), i.getDiameter());
+			    } else {
+				    if (i.getFilled())
+						g2.fillOval(i.getX(), i.getY(), i.getDiameter(), i.getDiameter());
+				    else
+						g2.drawOval(i.getX(), i.getY(), i.getDiameter(), i.getDiameter());
+			    }
 			    break;
 			case "Circle":
 				g2.setStroke(new BasicStroke(3));
@@ -239,13 +263,13 @@ public class GraphGUI extends JPanel {
 			    else
 					g2.drawOval(i.getX(), i.getY(), i.getDiameter(), i.getDiameter());
 			    break;
-			case "Rectangle":
+			case "Quadrilateral":
 				g2.setStroke(new BasicStroke(3));
-				PlotPoint[] pointsInRectangle = i.getpList();
-				g2.drawLine(pointsInRectangle[0].getX(), pointsInRectangle[0].getY(), pointsInRectangle[1].getX(), pointsInRectangle[1].getY());
-				g2.drawLine(pointsInRectangle[1].getX(), pointsInRectangle[1].getY(), pointsInRectangle[2].getX(), pointsInRectangle[2].getY());
-				g2.drawLine(pointsInRectangle[2].getX(), pointsInRectangle[2].getY(), pointsInRectangle[3].getX(), pointsInRectangle[3].getY());
-				g2.drawLine(pointsInRectangle[3].getX(), pointsInRectangle[3].getY(), pointsInRectangle[0].getX(), pointsInRectangle[0].getY());
+				PlotPoint[] pointsInQuadrilateral = i.getpList();
+				g2.drawLine(pointsInQuadrilateral[0].getX(), pointsInQuadrilateral[0].getY(), pointsInQuadrilateral[1].getX(), pointsInQuadrilateral[1].getY());
+				g2.drawLine(pointsInQuadrilateral[1].getX(), pointsInQuadrilateral[1].getY(), pointsInQuadrilateral[2].getX(), pointsInQuadrilateral[2].getY());
+				g2.drawLine(pointsInQuadrilateral[2].getX(), pointsInQuadrilateral[2].getY(), pointsInQuadrilateral[3].getX(), pointsInQuadrilateral[3].getY());
+				g2.drawLine(pointsInQuadrilateral[3].getX(), pointsInQuadrilateral[3].getY(), pointsInQuadrilateral[0].getX(), pointsInQuadrilateral[0].getY());
 				break;
 			}
 		}

@@ -1,13 +1,16 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
 	"runtime"
-	"encoding/json"
+	"github.com/therecipe/qt/core"
+	"github.com/therecipe/qt/widgets"
 )
 
 type LatestData struct {
@@ -15,13 +18,38 @@ type LatestData struct {
 }
 
 type Data struct {
-	Latest LatestData `json:"latest"`
-	Current string `json:"current"`
+	Latest  LatestData `json:"latest"`
+	Current string     `json:"current"`
 }
 
 func main() {
-	var latest string;
-	var current string;
+	app := widgets.NewQApplication(len(os.Args), os.Args)
+
+	window := widgets.NewQMainWindow(nil, 0)
+	window.SetWindowTitle("Loading Example")
+	window.SetMinimumSize2(300, 200)
+
+	centralWidget := widgets.NewQWidget(nil, 0)
+	centralWidget.SetLayout(widgets.NewQVBoxLayout())
+
+	loadingText := widgets.NewQLabel2("Updating...", nil, 0)
+
+	centralWidget.Layout().AddWidget(loadingText)
+
+	window.SetCentralWidget(centralWidget)
+	window.Show()
+
+	// Simulate a loading process
+	time.Sleep(3 * time.Second)
+
+	// Update the text and hide the loading icon
+	loadingText.SetText("Update Complete")
+	loadingIcon.Hide()
+
+	app.Exec()
+
+	var latest string
+	var current string
 
 	fileContent, err := ioutil.ReadFile("version.dat")
 
@@ -36,13 +64,13 @@ func main() {
 	}
 	defer resp.Body.Close()
 
-	body,err := ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
 
 	var onlineData Data
 	err = json.Unmarshal(body, &onlineData)
 	latest = onlineData.Latest.Release
 
-	if (current != latest) {
+	if current != latest {
 		update(latest)
 	}
 
@@ -59,10 +87,10 @@ func main() {
 	os.Exit(0)
 }
 
-
 func update(newVersion string) {
 
-	var url string;
+	var url string
+	var fileName string
 
 	if runtime.GOOS == "windows" {
 		url = "https://credo-downloads.s3.us-east-2.amazonaws.com/public/v1.011/Credo+Calculator+Installer.exe"
@@ -81,16 +109,6 @@ func update(newVersion string) {
 	}
 	defer resp.Body.Close()
 
-	// Read response body into a variable
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-
-	// Write the response body to a file
-	var fileName string
-
 	if runtime.GOOS == "windows" {
 		fileName = "Andromeda.exe"
 	} else {
@@ -104,10 +122,18 @@ func update(newVersion string) {
 	}
 	defer file.Close()
 
-	_, err = file.Write(body)
+	_, err = io.Copy(file, resp.Body)
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("Error writing to the file:", err)
 		return
+	}
+
+	if runtime.GOOS != "windows" {
+		err = os.Chmod("Andromeda", 0755)
+		if err != nil {
+			fmt.Println("Error setting file permissions:", err)
+			return
+		}
 	}
 
 	ioutil.WriteFile("version.dat", []byte("{\"current\":\""+newVersion+"\"}"), 0644)

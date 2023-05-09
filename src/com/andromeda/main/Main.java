@@ -483,10 +483,12 @@ public class Main {
 				case "Segment":
 					definitionText = "One dimensional structure between two points";
 					break;
+                case "Circle":
+                	definitionText = "A collection of all the points equidistant from a point on a plane";
+                	break;
                 case "Text":
-                    definitionText = "a fucking textbox you dumbass";
-                    break;
-			
+                	definitionText = "No definition";
+                	break;
 			}
 			
 			descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/9, (int) (screen.getWidth()/100), "Definition: "+definitionText, TextAttribute.WEIGHT_SEMIBOLD, true), false);
@@ -542,7 +544,7 @@ public class Main {
 					public void mouseEntered(MouseEvent e) {}
 					public void mouseClicked(MouseEvent e) {}
 				});
-				midpointBtn.setBounds((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.35), screen.width/12, screen.height/30);
+				midpointBtn.setBounds((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.35), screen.width/11, screen.height/30);
 				descBar.add(midpointBtn);
 				
 				descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/1, (int) (screen.getWidth()/100), "Segment Length: " + "500" + selectedUnit, TextAttribute.WEIGHT_BOLD), false);
@@ -551,8 +553,8 @@ public class Main {
 				
 				
             case "Text":
-                descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/5, (int) (screen.getWidth()/100), "X: ", TextAttribute.WEIGHT_SEMIBOLD), false);
-                descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/4, (int) (screen.getWidth()/100), "Y: ", TextAttribute.WEIGHT_SEMIBOLD), false);
+                descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/4.8), (int) (screen.getWidth()/100), "X: ", TextAttribute.WEIGHT_SEMIBOLD), false);
+                descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/3.8), (int) (screen.getWidth()/100), "Y: ", TextAttribute.WEIGHT_SEMIBOLD), false);
                 
                 Instruction textPoint = null;
                 
@@ -631,6 +633,9 @@ public class Main {
                 
                 break;
 		
+            case "Circle":
+            	addXandY(j, g);
+            	break;
 			}
 			
 			JButton deleteButton = new JButton();
@@ -663,7 +668,7 @@ public class Main {
 	}
 	
 	private static void addTextEntry(Instruction j, GraphGUI g) {
-		        descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/3, (int) (screen.getWidth()/100), "Text: ", TextAttribute.WEIGHT_SEMIBOLD), false);        
+		        descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.97), (int) (screen.getWidth()/100), "Text: ", TextAttribute.WEIGHT_SEMIBOLD), false);        
         
         JTextField textBoxData = new JTextField();
         textBoxData.setText(j.getText());
@@ -684,11 +689,13 @@ public class Main {
     }
 	
 	private static void addXandY(Instruction j, GraphGUI g) {
-		descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/5, (int) (screen.getWidth()/100), "X: ", TextAttribute.WEIGHT_SEMIBOLD), false);
-		descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/4, (int) (screen.getWidth()/100), "Y: ", TextAttribute.WEIGHT_SEMIBOLD), false);
+		descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/4.8), (int) (screen.getWidth()/100), "X: ", TextAttribute.WEIGHT_SEMIBOLD), false);
+		descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/3.8), (int) (screen.getWidth()/100), "Y: ", TextAttribute.WEIGHT_SEMIBOLD), false);
 		
 		JTextField xField = new JTextField();
 		xField.setText(trusty.str(j.getX()));
+		
+		if (j.getType().equals("Circle")) xField.setText(trusty.str(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getX()));
 		
 		xField.setBounds((int) descBar.getWidth()/7, (int) Math.round(descBar.getHeight()/5.31), (int) screen.getWidth()/13, (int) screen.getHeight()/36);
 		xField.addKeyListener(new KeyListener() {
@@ -696,9 +703,24 @@ public class Main {
 			public void keyReleased(KeyEvent e) {
 				int oldX = j.getX();
 				
-				try {
-					if (!xField.getText().equals("")) j.setX(trusty.Int(xField.getText()));
-					else j.setX(0);
+				try {					
+					if (j.getType().equals("Circle")) {
+						if (!xField.getText().equals("")) {
+							g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().setX(trusty.Int(xField.getText()));
+							j.setX(trusty.Int(xField.getText())-(j.getDiameter()/2)+(Main.screen.width/180/2));
+							g.getInstructions().stream().filter(l -> l.getSuperObject().equals(j.getName())).findFirst().get().setY(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getY()+j.getDiameter()/2);
+							g.getInstructions().stream().filter(l -> l.getSuperObject().equals(j.getName())).findFirst().get().setX(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getX());
+						}
+						else {
+							g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().setX(0);
+							j.setX(trusty.Int(xField.getText())-(j.getDiameter()/2)+(Main.screen.width/180/2));
+							g.getInstructions().stream().filter(l -> l.getSuperObject().equals(j.getName())).findFirst().get().setY(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getY()+j.getDiameter()/2);
+							g.getInstructions().stream().filter(l -> l.getSuperObject().equals(j.getName())).findFirst().get().setX(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getX());
+						}
+					} else {
+						if (!xField.getText().equals("")) j.setX(trusty.Int(xField.getText()));
+						else j.setX(0);
+					}
 				} catch(NumberFormatException e1) {
 					;
 				}
@@ -734,6 +756,9 @@ public class Main {
 		
 		JTextField yField = new JTextField();
 		yField.setText(trusty.str(j.getY()));
+		
+		if (j.getType().equals("Circle")) yField.setText(trusty.str(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getY()));
+		
 		yField.setBounds((int) descBar.getWidth()/7, (int) Math.round(descBar.getHeight()/4.2), (int) screen.getWidth()/13, (int) screen.getHeight()/36);
 		yField.addKeyListener(new KeyListener() {
 			public void keyTyped(KeyEvent e) {}
@@ -741,8 +766,23 @@ public class Main {
 				int oldY = j.getY();
 				
 				try {
-					if (!yField.getText().equals("")) j.setY(trusty.Int(yField.getText()));
-					else j.setY(0);
+					if (!j.getType().equals("Circle")) {
+						if (!yField.getText().equals("")) j.setY(trusty.Int(yField.getText()));
+						else j.setY(0);
+					} else {
+						if (!yField.getText().equals("")) {
+							g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().setY(trusty.Int(yField.getText()));
+							j.setY(trusty.Int(yField.getText())-(j.getDiameter()/2)+(Main.screen.width/180/2));
+							g.getInstructions().stream().filter(l -> l.getSuperObject().equals(j.getName())).findFirst().get().setY(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getY()+j.getDiameter()/2);
+							g.getInstructions().stream().filter(l -> l.getSuperObject().equals(j.getName())).findFirst().get().setX(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getX());
+						}
+						else {
+							g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().setY(0);
+							j.setY(0-(j.getDiameter()/2)+(Main.screen.width/180/2));
+							g.getInstructions().stream().filter(l -> l.getSuperObject().equals(j.getName())).findFirst().get().setY(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getY()+j.getDiameter()/2);
+							g.getInstructions().stream().filter(l -> l.getSuperObject().equals(j.getName())).findFirst().get().setX(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getX());
+						}
+					}
 				} catch(NumberFormatException e1) {
 					;
 				}
@@ -750,7 +790,6 @@ public class Main {
 				if (j.getType().equals("Point")) {
 					ArrayList<Instruction> replacementInstructions = new ArrayList<>();
 					for (Instruction i : g.getInstructions()) {
-						
 						if (i.getType().equals("Segment")) {
 							if (i.getP1().getX()-(screen.width/180/2) == j.getX() || i.getP2().getX()-(screen.width/180/2) == j.getX() && i.getP1().getY()-(screen.width/180/2) == oldY || i.getP2().getY()-(screen.width/180/2) == oldY) {
 								if (i.getP1().getX()-(screen.width/180/2) == j.getX()) {

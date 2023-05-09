@@ -14,8 +14,8 @@ import java.awt.font.TextAttribute;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -34,13 +34,8 @@ public class DescriptionBar extends JPanel {
 	public void removeElement(Instruction i, GraphGUI g) {
 		if(JOptionPane.showConfirmDialog(Main.frame, "Are you sure you want to remove this item?") == 0) {
 			ArrayList<Instruction> replacementList = g.getInstructions();
-			for (Iterator<Instruction> iterator = replacementList.iterator(); iterator.hasNext(); ) {
-			    Instruction l = iterator.next();
-			    if (l.getSuperObject().equals(i.getName())) {
-			    	iterator.remove();
-			    }
-			}
-			replacementList.remove(i);
+				replacementList.removeAll(replacementList.stream().filter(l -> l.getSuperObject().contains(i.getName())).collect(Collectors.toList()));
+				replacementList.remove(i);
 			g.setInstructions(replacementList);
 			g.repaint();
 			g.paintComponents(g.getGraphics());
@@ -115,7 +110,7 @@ public class DescriptionBar extends JPanel {
 		    textArea.setBackground(this.getBackground());
 		    textArea.setEditable(false);
 		    textArea.setHighlighter(null);
-		    textArea.setBounds(i.getX(), i.getY()-17, this.getWidth()-i.getX()-13, this.getHeight()-i.getY());
+		    textArea.setBounds(i.getX(), i.getY()-20, this.getWidth()-i.getX()-30, this.getHeight()-i.getY());
 		    
 		    texts.add(textArea);
 		    
