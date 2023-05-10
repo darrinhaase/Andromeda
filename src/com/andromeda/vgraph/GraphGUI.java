@@ -65,6 +65,17 @@ public class GraphGUI extends JPanel {
 				tempInstruction.setSquare(true);
 			    drawTextBox(x, y);
 			    break;
+
+            case "triangle":
+                if (plotnum % 3 == 0) {
+                    tempInstruction.setSuperObject(trusty.str(naming));
+                    drawTriangle(trusty.str(plotnum-2), trusty.str(plotnum-1), trusty.str(plotnum));
+                    currentlyDrawing = false;
+                } else {
+                    tempInstruction.setSuperObject("mid"+trusty.str(naming));
+                    currentlyDrawing = true;
+                }
+                break;
 			    
 
 			case "point":
@@ -270,6 +281,14 @@ public class GraphGUI extends JPanel {
 				g2.drawLine(pointsInQuadrilateral[1].getX(), pointsInQuadrilateral[1].getY(), pointsInQuadrilateral[2].getX(), pointsInQuadrilateral[2].getY());
 				g2.drawLine(pointsInQuadrilateral[2].getX(), pointsInQuadrilateral[2].getY(), pointsInQuadrilateral[3].getX(), pointsInQuadrilateral[3].getY());
 				g2.drawLine(pointsInQuadrilateral[3].getX(), pointsInQuadrilateral[3].getY(), pointsInQuadrilateral[0].getX(), pointsInQuadrilateral[0].getY());
+				break;
+
+			case "Triangle":
+				g2.setStroke(new BasicStroke(3));
+				PlotPoint[] pointsInTriangle = i.getpList();
+				g2.drawLine(pointsInTriangle[0].getX(), pointsInTriangle[0].getY(), pointsInTriangle[1].getX(), pointsInTriangle[1].getY());
+				g2.drawLine(pointsInTriangle[1].getX(), pointsInTriangle[1].getY(), pointsInTriangle[2].getX(), pointsInTriangle[2].getY());
+				g2.drawLine(pointsInTriangle[2].getX(), pointsInTriangle[2].getY(), pointsInTriangle[0].getX(), pointsInTriangle[0].getY());
 				break;
 			}
 		}

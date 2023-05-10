@@ -42,7 +42,7 @@ public class Main {
 	public static JFrame frame = null;
 
 	public static String selectedTool = "point";
-	public static String[] availableTools = {"point", "circle", "segment", "quadrilateral", "textbox"};
+	public static String[] availableTools = {"point", "segment", "quadrilateral", "triangle", "circle", "textbox"};
 	
     public static String selectedUnit = "cm";
     public static String[] availableUnits = {"cm", "in"};
@@ -539,7 +539,7 @@ public class Main {
 				midpointBtn.setBounds((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.35), screen.width/11, screen.height/30);
 				descBar.add(midpointBtn);
 				
-				descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/1, (int) (screen.getWidth()/100), "Segment Length: " + "500" + selectedUnit, TextAttribute.WEIGHT_BOLD), false);
+				descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/1, (int) (screen.getWidth()/100), "Segment Length: " + currentGraph.calculateDistance(j.getP1().getX(), j.getP1().getY(), j.getP2().getX(), j.getP2().getY()) + selectedUnit, TextAttribute.WEIGHT_BOLD), false);
 				
 				break;
 				
