@@ -96,7 +96,7 @@ public class Instruction implements Serializable {
                  int x2 = this.quad.xpoints[j];
                  int y2 = this.quad.ypoints[j];
 
-                 double distance = pointToLineDistance(x, y, x1, y1, x2, y2);
+                 double distance = pointToLineSegmentDistance(x, y, x1, y1, x2, y2);
 
                  double threshold = 5.0;
 
@@ -106,11 +106,27 @@ public class Instruction implements Serializable {
 		return false;
 	}
 	
-	private double pointToLineDistance(int x, int y, int x1, int y1, int x2, int y2) {
-        double numerator = Math.abs((x2 - x1) * (y1 - y) - (x1 - x) * (y2 - y1));
-        double denominator = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
-        return numerator / denominator;
+	private static double pointToLineSegmentDistance(int x, int y, int x1, int y1, int x2, int y2) {
+        double dx = x2 - x1;
+        double dy = y2 - y1;
+    
+        if (dx == 0 && dy == 0) {
+            return Math.sqrt(Math.pow((x - x1), 2) + Math.pow((y - y1), 2));
+        }
+    
+        double t = ((x - x1) * dx + (y - y1) * dy) / (dx * dx + dy * dy);
+    
+        if (t < 0) { 
+            return Math.sqrt(Math.pow((x - x1), 2) + Math.pow((y - y1), 2));
+        } else if (t > 1) {
+            return Math.sqrt(Math.pow((x - x2), 2) + Math.pow((y - y2), 2));
+        } else {
+            double closestX = x1 + t * dx;
+            double closestY = y1 + t * dy;
+            return Math.sqrt(Math.pow((x - closestX), 2) + Math.pow((y - closestY), 2));
+        }
     }
+
 	
 	public static float slope(float x1, float y1, float x2, float y2) {
 		if (x2 - x1 != 0) return (y2 - y1)*-1 / (x2 - x1);
