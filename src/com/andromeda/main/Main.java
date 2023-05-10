@@ -90,12 +90,10 @@ public class Main {
 	
 	public static void main(String[] args) throws Exception {
 
-			frame = trusty.frame("Jesuit Geometry - Andromeda", screen.width/2, screen.height, "logo.png", false);
+			frame = trusty.frame("Jesuit Geometry - Andromeda", screen.width/2, screen.height, "assets/logo.png", false);
 			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			frame.setVisible(true);
 			frame.setResizable(false);
-			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-			frame.setDefaultLookAndFeelDecorated(true);
 			frame.addKeyListener(new KeyListener() {
 				public void keyTyped(KeyEvent e) {}
 				public void keyReleased(KeyEvent e) {}
@@ -629,6 +627,44 @@ public class Main {
 		
             case "Circle":
             	addXandY(j, g);
+            	descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.97), (int) (screen.getWidth()/100), "Radius: ", TextAttribute.WEIGHT_SEMIBOLD), false);        
+                
+                JTextField radiusBox = new JTextField();
+                radiusBox.setText(trusty.str(j.getDiameter()/2));
+                radiusBox.setBounds((int) descBar.getWidth()/4, (int) Math.round(descBar.getHeight()/3.17), (int) screen.getWidth()/13, (int) screen.getHeight()/36);
+                
+                radiusBox.addKeyListener(new KeyListener() {
+                    public void keyTyped(KeyEvent e) {}
+                    public void keyReleased(KeyEvent e) {
+                    	
+                    	Instruction outerPoint = g.getInstructions().stream().filter(l -> l.getSuperObject().equals(j.getName())).findFirst().get();
+                    	Instruction middlePoint = g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get();	
+                    	
+                        try {					
+        						if (!radiusBox.getText().equals("")) {
+        							j.setX((middlePoint.getX()+(Main.screen.width/180/2))-trusty.Int(radiusBox.getText()));
+        							j.setY(middlePoint.getY()+(Main.screen.width/180/2)-(trusty.Int(radiusBox.getText())));
+        							j.setDiameter(trusty.Int(radiusBox.getText())*2);
+        							outerPoint.setX(middlePoint.getX());
+        							outerPoint.setY(middlePoint.getY()+j.getDiameter()/2);
+        						}
+        						else {
+        							j.setDiameter(0);
+        							outerPoint.setY(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getY()+j.getDiameter()/2);
+        							outerPoint.setX(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getX());
+        						}
+        				} catch(NumberFormatException e1) {
+        					;
+        				}
+                        
+                        frame.repaint();
+                        g.repaint();
+                        g.paintComponent(g.getGraphics());
+                    }
+                    public void keyPressed(KeyEvent e) {}
+                    });
+                
+                descBar.add(radiusBox);
             	break;
 			}
 			
@@ -652,10 +688,11 @@ public class Main {
 					}
 					public void mouseClicked(MouseEvent e) {}
 				});
-				deleteButton.setBounds((int) Math.round(descBar.getWidth()/13), (int) Math.round(descBar.getHeight()/1.22), screen.width/6, screen.height/30);
-					
+				
+				if (System.getProperty("os.name").toLowerCase().contains("windows")) deleteButton.setBounds((int) Math.round(descBar.getWidth()/13), (int) Math.round(descBar.getHeight()/1.18), screen.width/6, screen.height/30);
+				else deleteButton.setBounds((int) Math.round(descBar.getWidth()/13), (int) Math.round(descBar.getHeight()/1.22), screen.width/6, screen.height/30);
+				
 				if (j.getSuperObject().equals("")) descBar.add(deleteButton);
-			
 			toggleDescriptionBar(true);
 			break;
 		}

@@ -58,12 +58,19 @@ public class trusty implements ActionListener {
 		
 		else {
 			
-			if (!System.getProperty("os.name").toLowerCase().contains("windows"))  {
-			    Image image =  ImageIO.read(new File(imagepath);
-                Application.getApplication().setDockIconImage(image);
-			} else {
-			    frame.setIconImage(new ImageIcon(imagepath).getImage());
-			}
+	
+				if (System.getProperty("os.name").toLowerCase().contains("windows")) frame.setIconImage(new ImageIcon(imagepath).getImage());
+				else {
+					final Taskbar taskbar = Taskbar.getTaskbar();
+					try {
+			            taskbar.setIconImage(new ImageIcon(imagepath).getImage());
+			        } catch (final UnsupportedOperationException e) {
+			            System.out.println("The os does not support: 'taskbar.setIconImage'");
+			        } catch (final SecurityException e) {
+			            System.out.println("There was a security exception for: 'taskbar.setIconImage'");
+			        }
+				}
+		        
 		}
 		
 		return frame;
