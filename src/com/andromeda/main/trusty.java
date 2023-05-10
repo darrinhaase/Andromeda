@@ -52,14 +52,18 @@ public class trusty implements ActionListener {
 		
 		if (imagepath == null) {
 			
-		frame.setIconImage(null);
+			frame.setIconImage(null);
 		
 		}
 		
 		else {
 			
-			frame.setIconImage(new ImageIcon(imagepath).getImage());
-			
+			if (!System.getProperty("os.name").toLowerCase().contains("windows"))  {
+			    Image image =  ImageIO.read(new File(imagepath);
+                Application.getApplication().setDockIconImage(image);
+			} else {
+			    frame.setIconImage(new ImageIcon(imagepath).getImage());
+			}
 		}
 		
 		return frame;

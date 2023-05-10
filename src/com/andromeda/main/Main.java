@@ -23,17 +23,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.JViewport;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import com.andromeda.desc.DescriptionBar;
 import com.andromeda.desc.DrawingText;
@@ -100,9 +90,12 @@ public class Main {
 	
 	public static void main(String[] args) throws Exception {
 
-			frame = trusty.frame("Jesuit Geometry - Andromeda", screen.width/2, screen.height, "assets/logo.png", false);
+			frame = trusty.frame("Jesuit Geometry - Andromeda", screen.width/2, screen.height, "logo.png", false);
 			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			frame.setVisible(true);
+			frame.setResizable(false);
+			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+			frame.setDefaultLookAndFeelDecorated(true);
 			frame.addKeyListener(new KeyListener() {
 				public void keyTyped(KeyEvent e) {}
 				public void keyReleased(KeyEvent e) {}
@@ -396,6 +389,7 @@ public class Main {
 		currentGraph.saveFile = file;
 		currentGraph.saved = true;
 	}
+
 	
 	private static JScrollPane newTab() throws Exception {
 		toggleDescriptionBar(false);
@@ -487,7 +481,7 @@ public class Main {
                 	definitionText = "A collection of all the points equidistant from a point on a plane";
                 	break;
                 case "Text":
-                	definitionText = "No definition";
+                	definitionText = "A way to label your sketches";
                 	break;
 			}
 			
@@ -658,7 +652,7 @@ public class Main {
 					}
 					public void mouseClicked(MouseEvent e) {}
 				});
-				deleteButton.setBounds((int) Math.round(descBar.getWidth()/13), (int) Math.round(descBar.getHeight()/1.18), screen.width/6, screen.height/30);
+				deleteButton.setBounds((int) Math.round(descBar.getWidth()/13), (int) Math.round(descBar.getHeight()/1.22), screen.width/6, screen.height/30);
 					
 				if (j.getSuperObject().equals("")) descBar.add(deleteButton);
 			
