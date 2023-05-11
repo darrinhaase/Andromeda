@@ -15,14 +15,14 @@ public class Instruction implements Serializable {
 	private String superObject = "";
 	public boolean active = false;
 	private boolean square = false;
-	private Polygon quad = new Polygon();
+	private Polygon polyShape = new Polygon();
 	
-	public Polygon getQuad() {
-		return quad;
+	public Polygon getPolyShape() {
+		return polyShape;
 	}
 
-	public void setQuad(Polygon quad) {
-		this.quad = quad;
+	public void setPolyShape(Polygon quad) {
+		this.polyShape = quad;
 	}
 
 	public boolean isSquare() {
@@ -87,14 +87,14 @@ public class Instruction implements Serializable {
 		} else if (this.type.equals("Circle")) {
 			double distance = GraphGUI.calculateDistance(x, y, this.x+d/2, this.y+d/2);
 			return Math.abs(distance - d/2) <= 5;
-		} else if (this.type.equals("Quadrilateral")) {
-			 for (int i = 0; i < this.quad.npoints; i++) {
-                 int j = (i + 1) % this.quad.npoints;
+		} else if (this.type.equals("Quadrilateral") || this.type.equals("Triangle")) {
+			 for (int i = 0; i < this.polyShape.npoints; i++) {
+                 int j = (i + 1) % this.polyShape.npoints;
 
-                 int x1 = this.quad.xpoints[i];
-                 int y1 = this.quad.ypoints[i];
-                 int x2 = this.quad.xpoints[j];
-                 int y2 = this.quad.ypoints[j];
+                 int x1 = this.polyShape.xpoints[i];
+                 int y1 = this.polyShape.ypoints[i];
+                 int x2 = this.polyShape.xpoints[j];
+                 int y2 = this.polyShape.ypoints[j];
 
                  double distance = pointToLineSegmentDistance(x, y, x1, y1, x2, y2);
 
@@ -105,6 +105,20 @@ public class Instruction implements Serializable {
 		}
 		return false;
 	}
+	
+	public static int calculatePolygonArea(int[] xPoints, int[] yPoints) {
+        int n = xPoints.length;
+        int area = 0;
+
+        for (int i = 0; i < n - 1; i++) {
+            area += (xPoints[i] * yPoints[i + 1]) - (xPoints[i + 1] * yPoints[i]);
+        }
+        area += (xPoints[n - 1] * yPoints[0]) - (xPoints[0] * yPoints[n - 1]);
+
+        area = Math.abs(area) / 2;
+
+        return area;
+    }
 	
 	private static double pointToLineSegmentDistance(int x, int y, int x1, int y1, int x2, int y2) {
         double dx = x2 - x1;
@@ -126,7 +140,11 @@ public class Instruction implements Serializable {
             return Math.sqrt(Math.pow((x - closestX), 2) + Math.pow((y - closestY), 2));
         }
     }
-
+	
+	public static double calculateCircleArea(int radius) {
+        double area = Math.PI * Math.pow(radius, 2);
+        return area;
+    }
 	
 	public static float slope(float x1, float y1, float x2, float y2) {
 		if (x2 - x1 != 0) return (y2 - y1)*-1 / (x2 - x1);

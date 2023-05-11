@@ -3,6 +3,7 @@ package com.andromeda.main;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -21,7 +22,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -40,12 +43,13 @@ public class Main {
 	private static JTabbedPane tabbedPane;
 	private static DescriptionBar descBar = new DescriptionBar(screen);
 	public static JFrame frame = null;
+	private static final HashMap<String, Double> conversions = new HashMap<>();
 
 	public static String selectedTool = "point";
 	public static String[] availableTools = {"point", "segment", "quadrilateral", "triangle", "circle", "textbox"};
 	
-    public static String selectedUnit = "cm";
-    public static String[] availableUnits = {"cm", "in"};
+    public static String selectedUnit = "px";
+    public static String[] availableUnits = {"px", "cm", "in"};
 
 	public static void rebuildMenu(JMenu thisMenu, String[] itemsList, String selected, String typeView) {
 
@@ -59,11 +63,19 @@ public class Main {
 		for (int i = 0; i < itemsList.length; i++) {
 			//original string name in array for tool, used in plot();
 			String _tempToolName = itemsList[i];
+			String _tempToolDisplayName = "";
 
 			// build the display text shown in menu
-			String _tempToolDisplayName = _tempToolName.substring(0, 1).toUpperCase() + _tempToolName.substring(1) + " Tool";
-			if (_tempToolName == selected) {
-				_tempToolDisplayName += " (selected)";
+			if (Arrays.asList(availableTools).contains(_tempToolName)) {
+				_tempToolDisplayName = _tempToolName.substring(0, 1).toUpperCase() + _tempToolName.substring(1) + " Tool";
+				if (_tempToolName == selected) {
+					_tempToolDisplayName += " (selected)";
+				}
+			} else {
+				_tempToolDisplayName = _tempToolName.substring(0, 1).toUpperCase() + _tempToolName.substring(1) + " Unit";
+				if (_tempToolName == selected) {
+					_tempToolDisplayName += " (selected)";
+				}
 			}
 
 			// add item to JMenu
@@ -77,10 +89,15 @@ public class Main {
                                 return;
                         }
                      }
-					// when clicked, set the global selectedTool to the selected menu item
-					selectedTool = _tempToolName;
-					// run this function again on click to update (selected) indicator
-					rebuildMenu(thisMenu, itemsList, selectedTool, typeView);
+					if (Arrays.asList(availableTools).contains(_tempToolName)) {
+						// when clicked, set the global selectedTool to the selected menu item
+						selectedTool = _tempToolName;
+						// run this function again on click to update (selected) indicator
+						rebuildMenu(thisMenu, itemsList, selectedTool, typeView);
+					} else {
+						selectedUnit = _tempToolName;
+						rebuildMenu(thisMenu, itemsList, selectedUnit, typeView);
+					}
 					// reset plotnum count in current GraphUI
 					currentGraph.plotnum = 1;
 				}
@@ -89,11 +106,18 @@ public class Main {
 	}
 	
 	public static void main(String[] args) throws Exception {
+		
+			if (System.getProperty("os.name").toLowerCase().equals("mac")) {
+				Desktop.getDesktop().browse(new URI("https://andromeda.jesuitnotes.com"));
+			}
+		
+			conversions.put("px", 1d);
+			conversions.put("cm", 0.0264583333);
+			conversions.put("in", 0.010416666666666666);
 
 			frame = trusty.frame("Jesuit Geometry - Andromeda", screen.width/2, screen.height, "assets/logo.png", false);
 			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			frame.setVisible(true);
-			frame.setResizable(false);
 			frame.addKeyListener(new KeyListener() {
 				public void keyTyped(KeyEvent e) {}
 				public void keyReleased(KeyEvent e) {}
@@ -481,6 +505,12 @@ public class Main {
                 case "Text":
                 	definitionText = "A way to label your sketches";
                 	break;
+                case "Triangle":
+                	definitionText = "A plane figure with three straight sides and three angles";
+                	break;
+                case "Quadrilateral":
+                	definitionText = "A four-sided figure on a plane";
+                	break;
 			}
 			
 			descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/9, (int) (screen.getWidth()/100), "Definition: "+definitionText, TextAttribute.WEIGHT_SEMIBOLD, true), false);
@@ -539,7 +569,8 @@ public class Main {
 				midpointBtn.setBounds((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.35), screen.width/11, screen.height/30);
 				descBar.add(midpointBtn);
 				
-				descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), descBar.getHeight()/1, (int) (screen.getWidth()/100), "Segment Length: " + currentGraph.calculateDistance(j.getP1().getX(), j.getP1().getY(), j.getP2().getX(), j.getP2().getY()) + selectedUnit, TextAttribute.WEIGHT_BOLD), false);
+				descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/1.9), (int) (screen.getWidth()/100), "Segment Length: ", TextAttribute.WEIGHT_BOLD), false);
+				descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/1.78), (int) (screen.getWidth()/100), Math.round(GraphGUI.calculateDistance(j.getP1().getX(), j.getP1().getY(), j.getP2().getX(), j.getP2().getY())*scale)/scale*conversions.get(selectedUnit) + " " + selectedUnit, TextAttribute.WEIGHT_SEMIBOLD), false);
 				
 				break;
 				
@@ -631,7 +662,7 @@ public class Main {
                 
                 JTextField radiusBox = new JTextField();
                 radiusBox.setText(trusty.str(j.getDiameter()/2));
-                radiusBox.setBounds((int) descBar.getWidth()/4, (int) Math.round(descBar.getHeight()/3.17), (int) screen.getWidth()/13, (int) screen.getHeight()/36);
+                radiusBox.setBounds((int) Math.round(descBar.getWidth()/3.85), (int) Math.round(descBar.getHeight()/3.17), (int) screen.getWidth()/13, (int) screen.getHeight()/36);
                 
                 radiusBox.addKeyListener(new KeyListener() {
                     public void keyTyped(KeyEvent e) {}
@@ -665,6 +696,10 @@ public class Main {
                     });
                 
                 descBar.add(radiusBox);
+                
+                descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.45), (int) (screen.getWidth()/100), "Area: ", TextAttribute.WEIGHT_BOLD), false);        
+                descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.28), (int) (screen.getWidth()/100), trusty.str(Instruction.calculateCircleArea(j.getDiameter()/2)*conversions.get(selectedUnit))+ " " +selectedUnit, TextAttribute.WEIGHT_SEMIBOLD), false);        
+                
             	break;
 			}
 			

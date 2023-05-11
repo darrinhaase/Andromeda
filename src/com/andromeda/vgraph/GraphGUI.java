@@ -27,10 +27,6 @@ public class GraphGUI extends JPanel {
 	private ArrayList<Instruction> instructions = new ArrayList<>();
 	private int naming = 1;
 	public boolean currentlyDrawing = false;
-	
-	/*
-	 * DELETE FOR PRODUCTION
-	 */
 	public int plotnum = 1;
 	
 	public ArrayList<Instruction> getInstructions() {
@@ -165,10 +161,8 @@ public class GraphGUI extends JPanel {
 		}
 		
 		Instruction tempInstruction = new Instruction("Quadrilateral", String.valueOf(naming), point1, point2, point3, point4);
-			tempInstruction.setQuad(new Polygon(new int[] {point1.getX(), point2.getX(), point3.getX(), point4.getX()}, new int[] {point1.getY(), point2.getY(), point3.getY(), point4.getY()}, 4));
+			tempInstruction.setPolyShape(new Polygon(new int[] {point1.getX(), point2.getX(), point3.getX(), point4.getX()}, new int[] {point1.getY(), point2.getY(), point3.getY(), point4.getY()}, 4));
 		instructions.add(tempInstruction);
-		
-		
 		
 		naming++;
 	}
@@ -185,6 +179,7 @@ public class GraphGUI extends JPanel {
 		}
 		
 		Instruction tempInstruction = new Instruction("Triangle", String.valueOf(naming), point1, point2, point3);
+			tempInstruction.setPolyShape(new Polygon(new int[] {point1.getX(), point2.getX(), point3.getX()}, new int[] {point1.getY(), point2.getY(), point3.getY()}, 3));
 		instructions.add(tempInstruction);
 		naming++;
 	}
