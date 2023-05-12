@@ -1,6 +1,7 @@
 package com.andromeda.vgraph;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.io.Serializable;
@@ -59,6 +60,20 @@ public class Instruction implements Serializable {
 	public void setColor(Color color) {
 		this.color = color;
 	}
+	
+	public static Point calculateMedian(double x1, double y1, double x2, double y2, double x3, double y3) {
+        double medianX = (x1 + x2 + x3) / 3.0;
+        double medianY = (y1 + y2 + y3) / 3.0;
+        
+        return new Point((int) Math.round(medianX), (int) Math.round(medianY));
+    }
+	
+	public static Point calculateMedian(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+        double medianX = (x1 + x2 + x3 + x4) / 4;
+        double medianY = (y1 + y2 + y3 + y4) / 4;
+        
+        return new Point((int) Math.round(medianX), (int) Math.round(medianY));
+    }
 
 	public boolean isColliding(int x, int y) {
 		if (this.type.equals("Point") || this.type.equals("Text")) {
@@ -141,9 +156,9 @@ public class Instruction implements Serializable {
         }
     }
 	
-	public static double calculateCircleArea(int radius) {
+	public static int calculateCircleArea(int radius) {
         double area = Math.PI * Math.pow(radius, 2);
-        return area;
+        return (int) Math.round(area);
     }
 	
 	public static float slope(float x1, float y1, float x2, float y2) {
@@ -157,7 +172,7 @@ public class Instruction implements Serializable {
 			return null;
 		} else {
 			float b = p1.getY() - m * p1.getX();
-			return new float[] {m, b, (p2.getY()-p1.getY()) * -1, p2.getX()-p1.getX()};
+			return new float[] {m, b, (p2.getY()-p1.getY()) * -1, p2.getX()-p1.getX(), };
 		}
 	}
 	

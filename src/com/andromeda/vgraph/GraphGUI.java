@@ -68,7 +68,7 @@ public class GraphGUI extends JPanel {
                     drawTriangle(trusty.str(plotnum-2), trusty.str(plotnum-1), trusty.str(plotnum));
                     currentlyDrawing = false;
                 } else {
-                    tempInstruction.setSuperObject("mid"+trusty.str(naming));
+                    tempInstruction.setSuperObject(trusty.str(naming));
                     currentlyDrawing = true;
                 }
                 break;
@@ -101,11 +101,11 @@ public class GraphGUI extends JPanel {
 
 			case "quadrilateral":
 				if (plotnum % 4 == 0) {
-					tempInstruction.setSuperObject("quad"+trusty.str(naming));
+					tempInstruction.setSuperObject(trusty.str(naming));
 					drawQuadrilateral(trusty.str(plotnum-3), trusty.str(plotnum-2), trusty.str(plotnum-1), trusty.str(plotnum));
 					currentlyDrawing = false;
 				} else {
-					tempInstruction.setSuperObject("quad"+trusty.str(naming));
+					tempInstruction.setSuperObject(trusty.str(naming));
 					currentlyDrawing = true;
 				}
 				break;

@@ -3,7 +3,6 @@ package com.andromeda.main;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -12,7 +11,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.font.TextAttribute;
@@ -22,7 +20,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -106,10 +103,6 @@ public class Main {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		
-			if (System.getProperty("os.name").toLowerCase().equals("mac")) {
-				Desktop.getDesktop().browse(new URI("https://andromeda.jesuitnotes.com"));
-			}
 		
 			conversions.put("px", 1d);
 			conversions.put("cm", 0.0264583333);
@@ -318,12 +311,16 @@ public class Main {
 				public void mouseReleased(MouseEvent e) {}
 				@Override
 				public void mousePressed(MouseEvent e) {
-					currentGraph.saved = false;
-					if (!tabbedPane.getTitleAt(tabbedPane.getSelectedIndex()).endsWith(" *")) {
-						tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), tabbedPane.getTitleAt(tabbedPane.getSelectedIndex())+" *");
+					if (e.getButton() == MouseEvent.BUTTON1) {
+						currentGraph.saved = false;
+						if (!tabbedPane.getTitleAt(tabbedPane.getSelectedIndex()).endsWith(" *")) {
+							tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), tabbedPane.getTitleAt(tabbedPane.getSelectedIndex())+" *");
+						}
+						graph.plot(e.getX(), e.getY());
+						graph.repaint();
+					} else if (e.getButton() == MouseEvent.BUTTON3) {
+						descriptionBarRender(graph, e.getX(), e.getY());
 					}
-					graph.plot(e.getX(), e.getY());
-					graph.repaint();
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {}
@@ -334,15 +331,6 @@ public class Main {
 					
 				}
 			});	
-			graph.addMouseMotionListener(new MouseMotionListener() {
-				@Override
-				public void mouseMoved(MouseEvent e) {
-					descriptionBarRender(graph, e.getX(), e.getY());
-				}
-				
-				@Override
-				public void mouseDragged(MouseEvent e) {}
-			});
 		
 		
 			FlatIntelliJLaf.updateUILater();
@@ -423,12 +411,16 @@ public class Main {
 			public void mouseReleased(MouseEvent e) {}
 			@Override
 			public void mousePressed(MouseEvent e) {
-				currentGraph.saved = false;
-				if (!tabbedPane.getTitleAt(tabbedPane.getSelectedIndex()).endsWith(" *")) {
-					tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), tabbedPane.getTitleAt(tabbedPane.getSelectedIndex())+" *");
+				if (e.getButton() == MouseEvent.BUTTON1) {
+					currentGraph.saved = false;
+					if (!tabbedPane.getTitleAt(tabbedPane.getSelectedIndex()).endsWith(" *")) {
+						tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), tabbedPane.getTitleAt(tabbedPane.getSelectedIndex())+" *");
+					}
+					newGraph.plot(e.getX(), e.getY());
+					newGraph.repaint();
+				} else if (e.getButton() == MouseEvent.BUTTON3) {
+					descriptionBarRender(newGraph, e.getX(), e.getY());
 				}
-				newGraph.plot(e.getX(), e.getY());
-				newGraph.repaint();
 			}
 			@Override
 			public void mouseExited(MouseEvent e) {}
@@ -440,15 +432,6 @@ public class Main {
 			public void mouseClicked(MouseEvent e) {
 				
 			}
-		});	
-		newGraph.addMouseMotionListener(new MouseMotionListener() {
-			@Override
-			public void mouseMoved(MouseEvent e) {
-				descriptionBarRender(newGraph, e.getX(), e.getY());
-			}
-			
-			@Override
-			public void mouseDragged(MouseEvent e) {}
 		});
 		
 		JScrollPane sP = new JScrollPane(newGraph);
@@ -571,6 +554,9 @@ public class Main {
 				
 				descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/1.9), (int) (screen.getWidth()/100), "Segment Length: ", TextAttribute.WEIGHT_BOLD), false);
 				descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/1.78), (int) (screen.getWidth()/100), Math.round(GraphGUI.calculateDistance(j.getP1().getX(), j.getP1().getY(), j.getP2().getX(), j.getP2().getY())*scale)/scale*conversions.get(selectedUnit) + " " + selectedUnit, TextAttribute.WEIGHT_SEMIBOLD), false);
+				
+				descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/1.6), (int) (screen.getWidth()/100), "Midpoint: ", TextAttribute.WEIGHT_BOLD), false);
+				descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/1.53), (int) (screen.getWidth()/100), "("+trusty.str(Math.round((j.getP2().getX()+j.getP1().getX())/2*conversions.get(selectedUnit)))+selectedUnit+", "+trusty.str(Math.round((j.getP1().getY()+j.getP2().getY())/2*conversions.get(selectedUnit))) + selectedUnit +")", TextAttribute.WEIGHT_SEMIBOLD), false);
 				
 				break;
 				
@@ -698,8 +684,18 @@ public class Main {
                 descBar.add(radiusBox);
                 
                 descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.45), (int) (screen.getWidth()/100), "Area: ", TextAttribute.WEIGHT_BOLD), false);        
-                descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.28), (int) (screen.getWidth()/100), trusty.str(Instruction.calculateCircleArea(j.getDiameter()/2)*conversions.get(selectedUnit))+ " " +selectedUnit, TextAttribute.WEIGHT_SEMIBOLD), false);        
+                descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.28), (int) (screen.getWidth()/100), trusty.str(Math.round(Instruction.calculateCircleArea(j.getDiameter()/2)*conversions.get(selectedUnit)))+ " " +selectedUnit, TextAttribute.WEIGHT_SEMIBOLD), false);        
                 
+            	break;
+            case "Triangle":
+            	addXandY(j, g);
+            	descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/3), (int) (screen.getWidth()/100), "Area: ", TextAttribute.WEIGHT_BOLD), false);        
+                descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.76), (int) (screen.getWidth()/100), trusty.str(Math.round(Instruction.calculatePolygonArea(j.getPolyShape().xpoints, j.getPolyShape().ypoints)*conversions.get(selectedUnit)))+ " " +selectedUnit, TextAttribute.WEIGHT_SEMIBOLD), false);        
+            	break;
+            case "Quadrilateral":
+            	addXandY(j, g);
+            	descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/3), (int) (screen.getWidth()/100), "Area: ", TextAttribute.WEIGHT_BOLD), false);        
+                descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/2.76), (int) (screen.getWidth()/100), trusty.str(Math.round(Instruction.calculatePolygonArea(j.getPolyShape().xpoints, j.getPolyShape().ypoints)*conversions.get(selectedUnit)))+ " " +selectedUnit, TextAttribute.WEIGHT_SEMIBOLD), false);        
             	break;
 			}
 			
@@ -759,7 +755,10 @@ public class Main {
 		descBar.renderText(new DrawingText((int) Math.round(descBar.getWidth()/21.5), (int) Math.round(descBar.getHeight()/3.8), (int) (screen.getWidth()/100), "Y: ", TextAttribute.WEIGHT_SEMIBOLD), false);
 		
 		JTextField xField = new JTextField();
-		xField.setText(trusty.str(j.getX()));
+		if (!j.getType().equals("Triangle") && !j.getType().equals("Quadrilateral"))
+			xField.setText(trusty.str(j.getX()));
+		else
+			xField.setText(trusty.str((int) Math.round(Instruction.calculateMedian(j.getpList()[0].getX(), j.getpList()[0].getY(), j.getpList()[1].getX(), j.getpList()[1].getY(), j.getpList()[2].getX(), j.getpList()[2].getY()).getX())));
 		
 		if (j.getType().equals("Circle")) xField.setText(trusty.str(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getX()));
 		
@@ -782,6 +781,46 @@ public class Main {
 							j.setX(trusty.Int(xField.getText())-(j.getDiameter()/2)+(Main.screen.width/180/2));
 							g.getInstructions().stream().filter(l -> l.getSuperObject().equals(j.getName())).findFirst().get().setY(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getY()+j.getDiameter()/2);
 							g.getInstructions().stream().filter(l -> l.getSuperObject().equals(j.getName())).findFirst().get().setX(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getX());
+						}
+					} else if (j.getType().equals("Triangle") || j.getType().equals("Quadrilateral")) {
+						if (!xField.getText().equals("")) {
+							if (j.getType().equals("Triangle"))
+								oldX = (int) Math.round(Instruction.calculateMedian(j.getpList()[0].getX(), j.getpList()[0].getY(), j.getpList()[1].getX(), j.getpList()[1].getY(), j.getpList()[2].getX(), j.getpList()[2].getY()).getX());
+							else
+								oldX = (int) Math.round(Instruction.calculateMedian(j.getpList()[0].getX(), j.getpList()[0].getY(), j.getpList()[1].getX(), j.getpList()[1].getY(), j.getpList()[2].getX(), j.getpList()[2].getY(), j.getpList()[3].getX(), j.getpList()[3].getY()).getX());
+							
+							int translationX = trusty.Int(xField.getText())-oldX;
+							
+							for (PlotPoint i : j.getpList()) {
+								i.setX(i.getX()+translationX);
+							}
+							
+							j.getPolyShape().translate(translationX, 0);
+							
+							for (Instruction l : g.getInstructions()) {
+								if (l.getSuperObject().equals(j.getName())) {
+									l.setX(l.getX()+translationX);
+								}
+							}
+						} else {
+							if (j.getType().equals("Triangle"))
+								oldX = (int) Math.round(Instruction.calculateMedian(j.getpList()[0].getX(), j.getpList()[0].getY(), j.getpList()[1].getX(), j.getpList()[1].getY(), j.getpList()[2].getX(), j.getpList()[2].getY()).getX());
+							else
+								oldX = (int) Math.round(Instruction.calculateMedian(j.getpList()[0].getX(), j.getpList()[0].getY(), j.getpList()[1].getX(), j.getpList()[1].getY(), j.getpList()[2].getX(), j.getpList()[2].getY(), j.getpList()[3].getX(), j.getpList()[3].getY()).getX());
+							
+							int translationX = 0-oldX;
+							
+							for (PlotPoint i : j.getpList()) {
+								i.setX(i.getX()+translationX);
+							}
+							
+							j.getPolyShape().translate(translationX, 0);
+							
+							for (Instruction l : g.getInstructions()) {
+								if (l.getSuperObject().equals(j.getName())) {
+									l.setX(l.getX()+translationX);
+								}
+							}
 						}
 					} else {
 						if (!xField.getText().equals("")) j.setX(trusty.Int(xField.getText()));
@@ -821,7 +860,11 @@ public class Main {
 		descBar.add(xField);
 		
 		JTextField yField = new JTextField();
-		yField.setText(trusty.str(j.getY()));
+		if (!j.getType().equals("Triangle") && !j.getType().equals("Quadrilateral"))
+			yField.setText(trusty.str(j.getY()));
+		else
+			yField.setText(trusty.str((int) Math.round(Instruction.calculateMedian(j.getpList()[0].getX(), j.getpList()[0].getY(), j.getpList()[1].getX(), j.getpList()[1].getY(), j.getpList()[2].getX(), j.getpList()[2].getY()).getY())));
+		
 		
 		if (j.getType().equals("Circle")) yField.setText(trusty.str(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getY()));
 		
@@ -832,10 +875,7 @@ public class Main {
 				int oldY = j.getY();
 				
 				try {
-					if (!j.getType().equals("Circle")) {
-						if (!yField.getText().equals("")) j.setY(trusty.Int(yField.getText()));
-						else j.setY(0);
-					} else {
+					if (j.getType().equals("Circle")) {
 						if (!yField.getText().equals("")) {
 							g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().setY(trusty.Int(yField.getText()));
 							j.setY(trusty.Int(yField.getText())-(j.getDiameter()/2)+(Main.screen.width/180/2));
@@ -848,6 +888,49 @@ public class Main {
 							g.getInstructions().stream().filter(l -> l.getSuperObject().equals(j.getName())).findFirst().get().setY(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getY()+j.getDiameter()/2);
 							g.getInstructions().stream().filter(l -> l.getSuperObject().equals(j.getName())).findFirst().get().setX(g.getInstructions().stream().filter(l -> l.getSuperObject().equals("mid"+j.getName())).findFirst().get().getX());
 						}
+					} else if (j.getType().equals("Triangle") || j.getType().equals("Quadrilateral")) {
+						if (!yField.getText().equals("")) {
+							if (j.getType().equals("Triangle"))
+								oldY = (int) Math.round(Instruction.calculateMedian(j.getpList()[0].getX(), j.getpList()[0].getY(), j.getpList()[1].getX(), j.getpList()[1].getY(), j.getpList()[2].getX(), j.getpList()[2].getY()).getY());
+							else
+								oldY = (int) Math.round(Instruction.calculateMedian(j.getpList()[0].getX(), j.getpList()[0].getY(), j.getpList()[1].getX(), j.getpList()[1].getY(), j.getpList()[2].getX(), j.getpList()[2].getY(), j.getpList()[3].getX(), j.getpList()[3].getY()).getY());
+							
+							int translationY = trusty.Int(yField.getText())-oldY;
+							
+							for (PlotPoint i : j.getpList()) {
+								i.setY(i.getY()+translationY);
+							}
+							
+							j.getPolyShape().translate(0, translationY);
+							
+							for (Instruction l : g.getInstructions()) {
+								if (l.getSuperObject().equals(j.getName())) {
+									l.setY(l.getY()+translationY);
+								}
+							}
+						} else {
+							if (j.getType().equals("Triangle"))
+								oldY = (int) Math.round(Instruction.calculateMedian(j.getpList()[0].getX(), j.getpList()[0].getY(), j.getpList()[1].getX(), j.getpList()[1].getY(), j.getpList()[2].getX(), j.getpList()[2].getY()).getY());
+							else
+								oldY = (int) Math.round(Instruction.calculateMedian(j.getpList()[0].getX(), j.getpList()[0].getY(), j.getpList()[1].getX(), j.getpList()[1].getY(), j.getpList()[2].getX(), j.getpList()[2].getY(), j.getpList()[3].getX(), j.getpList()[3].getY()).getY());
+							
+							int translationY = 0-oldY;
+							
+							for (PlotPoint i : j.getpList()) {
+								i.setY(i.getY()+translationY);
+							}
+							
+							j.getPolyShape().translate(0, translationY);
+							
+							for (Instruction l : g.getInstructions()) {
+								if (l.getSuperObject().equals(j.getName())) {
+									l.setY(l.getY()+translationY);
+								}
+							}
+						}
+					} else {
+						if (!yField.getText().equals("")) j.setY(trusty.Int(yField.getText()));
+						else j.setY(0);
 					}
 				} catch(NumberFormatException e1) {
 					;
