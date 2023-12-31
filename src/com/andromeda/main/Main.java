@@ -659,9 +659,9 @@ public class Main {
                     	
                         try {					
         						if (!radiusBox.getText().equals("")) {
-        							j.setX((middlePoint.getX()+(Main.screen.width/180/2))-trusty.Int(radiusBox.getText()));
-        							j.setY(middlePoint.getY()+(Main.screen.width/180/2)-(trusty.Int(radiusBox.getText())));
         							j.setDiameter(trusty.Int(radiusBox.getText())*2);
+        							j.setX(middlePoint.getX()+(Main.screen.width/180/2)-j.getDiameter()/2);
+        							j.setY(middlePoint.getY()+(Main.screen.width/180/2)-j.getDiameter()/2);
         							outerPoint.setX(middlePoint.getX());
         							outerPoint.setY(middlePoint.getY()+j.getDiameter()/2);
         						}
